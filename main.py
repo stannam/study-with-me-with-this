@@ -4,7 +4,16 @@ import os
 import pyglet
 import sys
 from datetime import datetime, timedelta
+from PyQt5.QtWidgets import QDialog, QApplication
+from MainWindow import Ui_MainWindow
 
+
+class AppWindow(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.show()
 
 # define the countdown func.
 def countdown(t, breaktime=False, time_table=False):
@@ -200,7 +209,7 @@ def by_num_of_sessions(t):
     write_html(tt_list=timetable)
 
     # if the first study session is expected to be longer than 50mins, start with break time
-    if (start_time > datetime.now()):
+    if start_time > datetime.now():
         list_for_countdown = [str(start_time.hour) + ':' + str(start_time.minute + 5) + 'r'] + list_for_countdown
 
     [countdown(item, time_table=True) for item in list_for_countdown]
@@ -248,7 +257,7 @@ def get_start_end_times(tt_line):
     return (session_start_time, session_end_time)
 
 
-def main(args, t=True):
+def main(args, t=' '):
     print(args)
     if len(args) == 2:
         try:
@@ -257,7 +266,9 @@ def main(args, t=True):
             pass
 
     while t:
-        t = input("Enter an end time (e.g., 20:00). Use the suffix 'r' for recess.... 'Ctrl + C'/ 'Cmd + .' for halt. '?' for help: ")
+        if t == ' ':
+            t = input("Enter an end time (e.g., 20:00). Use the suffix 'r' for recess.... "
+                      "'Ctrl + C'/ 'Cmd + .' for halt. '?' for help: ")
         if t == 'b':
             ring_bell()
         elif t == '?':
