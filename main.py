@@ -1,5 +1,6 @@
 # import the time module
 import time
+import asyncio
 import os
 import pyglet
 import sys
@@ -86,6 +87,80 @@ def countdown(t, breaktime=False, time_table=False):
 
     return False
 
+# async countdown function. this needs to be cleaned
+async def a_countdown(input_t, breaktime=False, time_table=False):
+    '''
+    updates the timer.
+
+    :param t: str in time format e.g., 12:34 or in time format plus 'r' e.g., 12:34r
+    :param breaktime: Bool. whether break time or study time.
+    :param time_table: Bool. whether time_table is printed.
+    :return: False
+    '''
+    if input_t[-1].isalpha():
+        t, breaktime = input_t[:-1], input_t[-1]
+        print(f'breaktime until {t}')
+    else:
+        print(f'input_t:{input_t} \n input_t[-1]: {input_t[-1]}')
+        t = input_t
+
+    try:
+
+        target_time = [int(i) for i in t.split(':')]
+    except ValueError:
+        print(f'timer didnt start with {t}')
+        return True
+
+    current_time = datetime.now()
+    next_day = False
+
+    if len(target_time) == 1:
+        return True
+    if target_time[0] < 13 and (current_time.hour - target_time[0]) > 0:
+        target_hour = target_time[0] + 12
+        if target_hour < current_time.hour:    # if target time refers to the next day
+            next_day = True
+            target_hour -= 12
+    else:
+        target_hour = target_time[0]
+    target_min = target_time[1]
+
+    try:
+        target_second = target_time[2]
+    except IndexError:
+        target_second = 0
+
+    try:
+        target_time = current_time.replace(hour=target_hour, minute=target_min, second=target_second)
+        if next_day:
+            target_time += timedelta(days=1)
+    except ValueError or OverflowError:
+        return True
+
+    diffsec = int((target_time - current_time).total_seconds())
+
+    file_name = '[BREAK]_TIME.txt' if breaktime else '[STUDY]_DOWN.txt'
+
+    timer_path = os.path.join(os.getcwd(), 'log', file_name)
+    while diffsec:
+        diffsec = int((target_time - datetime.now()).total_seconds())
+        if diffsec < 0:
+            diffsec = 0
+
+        mins, secs = divmod(diffsec, 60)
+        hours, mins = divmod(mins, 60)
+        timer = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
+
+        with open(timer_path, "w+", encoding='utf-8-sig') as f:  # print timer
+            f.write(timer)
+        if time_table:              # update timetable
+            update_timetable()
+        print(f'input_t:{input_t}\ntarget:{target_time}\ncurrenttime:{datetime.now()}\ntimer:{timer}\n------\n')
+        await asyncio.sleep(0.5)
+    # play the bell if the time is up
+    ring_bell()
+
+    return False
 
 def update_timetable():
     # read timetable list as list. if fails, just return True
