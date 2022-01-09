@@ -3,6 +3,7 @@ import sys
 import os
 import asyncio
 import qasync
+from PyQt5.QtWidgets import QAction
 
 import lofiplayer
 import main
@@ -19,12 +20,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
 
-        # initial todolist and timer
+        # initial todolist, timer and now_playing
         self.todo_load()
         self.timer_reset()
+        self.nb_start()
 
         # default timer button
         self.default_button.clicked.connect(self.timer_reset)
+
+        # to now button
+        self.to_now_button.clicked.connect(self.timer_to_now)
 
         # start timer button
         self.start_button.clicked.connect(self.timer_start)
@@ -53,7 +58,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.todoRadio_4.toggled.connect(lambda: self.change_current_doing(4))
         self.todoRadio_5.toggled.connect(lambda: self.change_current_doing(5))
 
-
     def change_current_doing(self, i=1):
         todo_content = getattr(self, f'todoText_{i}')
         todo_content = todo_content.text()
@@ -75,6 +79,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.session_count_lineEdit.setText('5')
         self.study_length_lineEdit.setText('50')
         self.break_length_lineEdit.setText('10')
+
+    def timer_to_now(self):
+        self.timerEdit.setTime(QTime.currentTime())
 
     def todo_load(self):
         if not os.path.isfile('log/todolist.txt'):
@@ -208,7 +215,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             task = asyncio.create_task(main.a_countdown(item, time_table=True))
             await task
 
-    async def cancel_existing_task(self, current_task_set):
+    async def cancel_existing_tasks(self, current_task_set):
         for t in current_task_set:
             if 'MainWindow' not in str(t):
                 t.cancel()

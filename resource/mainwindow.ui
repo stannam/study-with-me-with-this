@@ -170,7 +170,7 @@
         <string>Default</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="to_now_button_2">
+      <widget class="QPushButton" name="to_now_button">
        <property name="geometry">
         <rect>
          <x>200</x>
