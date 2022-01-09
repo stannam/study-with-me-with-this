@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>667</width>
-    <height>274</height>
+    <width>614</width>
+    <height>327</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -148,8 +148,8 @@
        <property name="geometry">
         <rect>
          <x>210</x>
-         <y>190</y>
-         <width>75</width>
+         <y>220</y>
+         <width>71</width>
          <height>23</height>
         </rect>
        </property>
@@ -160,14 +160,40 @@
       <widget class="QPushButton" name="default_button">
        <property name="geometry">
         <rect>
-         <x>120</x>
-         <y>190</y>
+         <x>130</x>
+         <y>220</y>
          <width>75</width>
          <height>23</height>
         </rect>
        </property>
        <property name="text">
         <string>Default</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="to_now_button_2">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>40</y>
+         <width>75</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>← To now</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="nb_music_button">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>190</y>
+         <width>151</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Nightbot now_playing </string>
        </property>
       </widget>
      </widget>
@@ -180,9 +206,9 @@
       <widget class="QPushButton" name="update_todo_button">
        <property name="geometry">
         <rect>
-         <x>220</x>
-         <y>190</y>
-         <width>75</width>
+         <x>200</x>
+         <y>220</y>
+         <width>81</width>
          <height>23</height>
         </rect>
        </property>
@@ -193,9 +219,9 @@
       <widget class="QCheckBox" name="todo_1">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>70</x>
          <y>30</y>
-         <width>70</width>
+         <width>16</width>
          <height>17</height>
         </rect>
        </property>
@@ -206,9 +232,9 @@
       <widget class="QCheckBox" name="todo_2">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>70</x>
          <y>60</y>
-         <width>53</width>
+         <width>16</width>
          <height>17</height>
         </rect>
        </property>
@@ -219,9 +245,9 @@
       <widget class="QCheckBox" name="todo_3">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>70</x>
          <y>90</y>
-         <width>70</width>
+         <width>16</width>
          <height>17</height>
         </rect>
        </property>
@@ -232,9 +258,9 @@
       <widget class="QCheckBox" name="todo_4">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>70</x>
          <y>120</y>
-         <width>70</width>
+         <width>16</width>
          <height>17</height>
         </rect>
        </property>
@@ -245,20 +271,20 @@
       <widget class="QPushButton" name="load_todo_txt_button">
        <property name="geometry">
         <rect>
-         <x>130</x>
-         <y>190</y>
+         <x>110</x>
+         <y>220</y>
          <width>75</width>
          <height>23</height>
         </rect>
        </property>
        <property name="text">
-        <string>Reload txt</string>
+        <string>Load txt</string>
        </property>
       </widget>
       <widget class="QPushButton" name="removeButton_1">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>30</y>
          <width>51</width>
          <height>23</height>
@@ -271,7 +297,7 @@
       <widget class="QPushButton" name="removeButton_2">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>60</y>
          <width>51</width>
          <height>23</height>
@@ -284,7 +310,7 @@
       <widget class="QPushButton" name="removeButton_3">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>90</y>
          <width>51</width>
          <height>23</height>
@@ -297,7 +323,7 @@
       <widget class="QPushButton" name="removeButton_4">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>120</y>
          <width>51</width>
          <height>23</height>
@@ -310,9 +336,9 @@
       <widget class="QLineEdit" name="todoText_1">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>110</x>
          <y>30</y>
-         <width>201</width>
+         <width>181</width>
          <height>20</height>
         </rect>
        </property>
@@ -320,9 +346,9 @@
       <widget class="QLineEdit" name="todoText_2">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>110</x>
          <y>60</y>
-         <width>201</width>
+         <width>181</width>
          <height>20</height>
         </rect>
        </property>
@@ -330,9 +356,9 @@
       <widget class="QLineEdit" name="todoText_3">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>110</x>
          <y>90</y>
-         <width>201</width>
+         <width>181</width>
          <height>20</height>
         </rect>
        </property>
@@ -340,9 +366,9 @@
       <widget class="QLineEdit" name="todoText_4">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>110</x>
          <y>120</y>
-         <width>201</width>
+         <width>181</width>
          <height>20</height>
         </rect>
        </property>
@@ -350,9 +376,9 @@
       <widget class="QLineEdit" name="todoText_5">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>110</x>
          <y>150</y>
-         <width>201</width>
+         <width>181</width>
          <height>20</height>
         </rect>
        </property>
@@ -360,9 +386,9 @@
       <widget class="QCheckBox" name="todo_5">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>70</x>
          <y>150</y>
-         <width>70</width>
+         <width>16</width>
          <height>17</height>
         </rect>
        </property>
@@ -373,7 +399,7 @@
       <widget class="QPushButton" name="removeButton_5">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>150</y>
          <width>51</width>
          <height>23</height>
@@ -382,6 +408,99 @@
        <property name="text">
         <string>Remove</string>
        </property>
+      </widget>
+      <widget class="QPushButton" name="apply_default_button">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>171</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Apply default</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="todoRadio_1">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>30</y>
+         <width>21</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
+      <widget class="QRadioButton" name="todoRadio_2">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>60</y>
+         <width>21</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
+      <widget class="QRadioButton" name="todoRadio_3">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>90</y>
+         <width>21</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
+      <widget class="QRadioButton" name="todoRadio_4">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>120</y>
+         <width>21</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
+      <widget class="QRadioButton" name="todoRadio_5">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>150</y>
+         <width>21</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
       </widget>
      </widget>
     </item>
@@ -392,7 +511,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>667</width>
+     <width>614</width>
      <height>21</height>
     </rect>
    </property>
@@ -401,4 +520,7 @@
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

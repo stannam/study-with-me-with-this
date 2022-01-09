@@ -9,12 +9,12 @@ from PyQt5.QtWidgets import QDialog, QApplication
 from MainWindow import Ui_MainWindow
 
 
-class AppWindow(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-        self.show()
+#  class AppWindow(QDialog):
+#      def __init__(self):
+#          super().__init__()
+#          self.ui = Ui_MainWindow()
+#          self.ui.setupUi(self)
+#          self.show()
 
 # define the countdown func.
 def countdown(t, breaktime=False, time_table=False):
@@ -242,37 +242,42 @@ def write_html(tt_list):
         tt_html.writelines(lines)
 
 
-def by_num_of_sessions(t):
-    start_time = datetime.now()
+def by_num_of_sessions(t, first_session_time=None, timetable_only=False, study_length=50, break_length=10):
+    # this function converts start time and number of study sessions into timetable and timer settings.
+    # t = number of sessions, start_time is time.
 
     # start_time is the time when the first session starts. It should be fixed since it needs to be referred later.
+    start_time = datetime.now()
     if start_time.minute < 30:
-        start_time = start_time.replace(minute=5, second=0)
+        start_time = start_time.replace(minute=0, second=0)
     else:
-        start_time = start_time.replace(minute=35, second=0)
+        start_time = start_time.replace(minute=30, second=0)
     try:
         t = int(t)
     except ValueError:
         return True
 
+    if first_session_time is not None:
+        start_time = start_time.replace(hour=first_session_time.hour, minute=first_session_time.minute, second=0)
+
+
+
     timetable = list()
     list_for_countdown = list()
 
     for t_session in range(t):
-        study_end_minutes = 50 * (t_session + 1) + 10 * t_session + 5
+        study_end_minutes = study_length * (t_session + 1) + break_length * t_session
 
         # study_start and study_end are variables for each session.
         study_end = start_time + timedelta(minutes=study_end_minutes)
-        break_end = study_end + timedelta(minutes=10)
-        study_start = study_end - timedelta(minutes=50)
+        break_end = study_end + timedelta(minutes=break_length)
+        study_start = study_end - timedelta(minutes=study_length)
 
         study_start_str = f"{study_start.hour:02d}" + ':' + f"{study_start.minute:02d}"
         study_end_str = f"{study_end.hour:02d}" + ':' + f"{study_end.minute:02d}"
         break_end_str = f"{break_end.hour:02d}" + ':' + f"{break_end.minute:02d}"
 
-        timetable.append(str('  ' + str(t_session + 1) + '    ' + study_start_str + '   -   '
-                             + study_end_str + '    50m  '))
-
+        timetable.append(str(f'  {t_session + 1}    {study_start_str}   -   {study_end_str}    {study_length}m  '))
         list_for_countdown.append(study_end_str)
         list_for_countdown.append(break_end_str + 'r')
     timetable_path = os.path.join(os.getcwd(), 'log', 'timetable.txt')
@@ -282,6 +287,9 @@ def by_num_of_sessions(t):
             f.write(line+'\n')
 
     write_html(tt_list=timetable)
+
+    if timetable_only:
+        return
 
     # if the first study session is expected to be longer than 50mins, start with break time
     if start_time > datetime.now():
@@ -343,13 +351,17 @@ def main(args, t=' '):
     while t:
         if t == ' ':
             t = input("Enter an end time (e.g., 20:00). Use the suffix 'r' for recess.... "
-                      "'Ctrl + C'/ 'Cmd + .' for halt. '?' for help: ")
+                      "'q' for exit. '?' for help: ")
+        if t.lower() == 'q':
+            break
         if t == 'b':
             ring_bell()
+            t = ' '
         elif t == '?':
             print("Type 'b' for bell test. Type '20:00r' for a break timer that ends at 20:00.\n"
                   "Type an integer e.g., 5 to start five 50-10 pomodoro sessions.\n"
                   "Force end the program by hitting 'Ctrl + C' on Windows or 'Cmd + . (dot/period)' on Mac.")
+            t = ' '
         elif ':' not in t:
             by_num_of_sessions(t)
         else:
