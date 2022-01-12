@@ -24,6 +24,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.todo_load()
         self.timer_reset()
         self.nb_start()
+        f = open('log/played_lofi.txt', 'a+', encoding="utf-8")
+        f.close()
 
         # default timer button
         self.default_button.clicked.connect(self.timer_reset)
@@ -164,7 +166,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if t._callbacks is not None:
                     print('need to kill this task')
                     print('kill it')
-            asyncio.create_task(self.cancel_existing_task(current_task_set))
+            asyncio.create_task(self.cancel_existing_tasks(current_task_set))
 
         countdown_list = list()
         first_session = self.timerEdit.time()
