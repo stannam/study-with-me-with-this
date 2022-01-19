@@ -155,7 +155,7 @@ async def a_countdown(input_t, breaktime=False, time_table=False):
             f.write(timer)
         if time_table:              # update timetable
             update_timetable()
-        print(f'input_t:{input_t}\ntarget:{target_time}\ncurrenttime:{datetime.now()}\ntimer:{timer}\n------\n')
+        # print(f'input_t:{input_t}\ntarget:{target_time}\ncurrenttime:{datetime.now()}\ntimer:{timer}\n------\n')
         await asyncio.sleep(0.5)
     # play the bell if the time is up
     ring_bell()
@@ -213,7 +213,8 @@ def write_html(tt_list):
     except FileNotFoundError:
         lines = ['<!DOCTYPE html>\n', '<html><head>'
                                       # '<meta http-equiv="refresh" content="5">'
-                                      '<style>body {font-family: \'NanumSquare\', serif}'
+                                      '<style>body {background-color: rgba(24, 24, 24, 255);'
+                                      'font-family: \'NanumSquare\', serif}'
                                       'table {border: 0px;font-size: 30px;font-weight: bold;text-align: left;'
                                       'width: 100%;border-spacing: 0;padding: 0px;white-space:pre}tr {color: white;}'
                                       'tr.highlighted {background-color: white; color: black;}'

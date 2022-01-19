@@ -3,8 +3,10 @@ import sys
 import os
 import asyncio
 import qasync
+import psutil
 from PyQt5.QtWidgets import QAction
 
+import nightbot_controller as nb_con
 import lofiplayer
 import main
 from PyQt5 import QtWidgets
@@ -19,6 +21,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
+
+        self.study_length = None
+        self.break_length = None
+        self.now = QTime.currentTime()
+        self.n_of_session = 0
+        self.first_session = QTime.currentTime()
 
         # initial todolist, timer and now_playing
         self.todo_load()
@@ -53,6 +61,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.load_todo_txt_button.clicked.connect(self.todo_load)
         self.update_todo_button.clicked.connect(self.todo_update)
 
+        # todolist checkbox
+        self.todo_1.toggled.connect(self.todo_update)
+        self.todo_2.toggled.connect(self.todo_update)
+        self.todo_3.toggled.connect(self.todo_update)
+        self.todo_4.toggled.connect(self.todo_update)
+        self.todo_5.toggled.connect(self.todo_update)
+
         # todolist current doing radio
         self.todoRadio_1.toggled.connect(lambda: self.change_current_doing(1))
         self.todoRadio_2.toggled.connect(lambda: self.change_current_doing(2))
@@ -60,7 +75,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.todoRadio_4.toggled.connect(lambda: self.change_current_doing(4))
         self.todoRadio_5.toggled.connect(lambda: self.change_current_doing(5))
 
-    def change_current_doing(self, i=1):
+    def change_current_doing(self, i=0):
+        if i == 0:
+            for j in range(5):
+                target_radio = getattr(self, f'todoRadio_{j+1}')
+                if target_radio.isChecked():
+                    self.change_current_doing(j+1)
+                    break
+            return
         todo_content = getattr(self, f'todoText_{i}')
         todo_content = todo_content.text()
         spacing_length = 18 - len(todo_content)
@@ -120,16 +142,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         with open('log/todolist.txt', 'w+', encoding="utf-8") as f:
             f.write(todo_list)
+        self.change_current_doing()  # update 'currently doing' prompt just in case
 
     def nb_start(self):
         asyncio.create_task(self.s_nb_start())
+        asyncio.create_task(nb_con.initialize())
 
     async def s_nb_start(self):
         command = 'resource\\nowplaying.bat'
-        subprocess.run(command, shell=True)
+        subprocess.Popen(command, shell=True)
         await asyncio.sleep(0.5)
 
-
+    def closeEvent(self, event):
+        current_task_set = asyncio.all_tasks()
+        asyncio.create_task(self.cancel_existing_tasks(current_task_set))
+        # parent_pid = os.getpid()
+        # parent = psutil.Process(parent_pid)
+        # children = parent.children(recursive=True)
+        # for child in children:
+        #     if 'chrome' not in child._name:
+        #         child.kill()
+        # gone, still_alive = psutil.wait_procs(children, timeout=5)
+        # parent.kill()
+        # parent.wait(5)
 
     def remove_todo(self, i=1):
         target_lineEdit = getattr(self, f'todoText_{i}')
@@ -157,6 +192,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 target_change.setText(old_todo_text)
                 target_cb.setChecked(old_todo_state)
                 original_change.setText('')
+        self.todo_update()
 
     def timer_start(self):
         # when 'start timer' button is clicked, start the timer
@@ -169,50 +205,62 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             asyncio.create_task(self.cancel_existing_tasks(current_task_set))
 
         countdown_list = list()
-        first_session = self.timerEdit.time()
-        n_of_session = int(self.session_count_lineEdit.text())
-        study_length = int(self.study_length_lineEdit.text())
-        break_length = int(self.break_length_lineEdit.text())
-        now = QTime.currentTime()
+        self.first_session = self.timerEdit.time()
+        self.n_of_session = int(self.session_count_lineEdit.text())
+        self.study_length = int(self.study_length_lineEdit.text())
+        self.break_length = int(self.break_length_lineEdit.text())
+        self.now = QTime.currentTime()
 
-        # update the time table
-        main.by_num_of_sessions(t=n_of_session,
-                                first_session_time=first_session.toPyTime(),
+        # update the timetable only
+        main.by_num_of_sessions(t=self.n_of_session,
+                                first_session_time=self.first_session.toPyTime(),
                                 timetable_only=True,
-                                study_length=study_length,
-                                break_length=break_length)
+                                study_length=self.study_length,
+                                break_length=self.break_length)
 
-        # below is for running the timer
-        time_difference = now.secsTo(first_session)
-        if time_difference > 0:
-            countdown_list.append(f'{first_session.toString("hh:mm")}r ')
-        elif time_difference < -60*50:
-            return
+        # below is for actually running the timer
+        time_difference = self.now.secsTo(self.first_session)
+        if 0 < time_difference < 60 * max(self.break_length, self.study_length):
+            countdown_list.append(f'{self.first_session.toString("hh:mm")}r ')
 
-        for i in range(n_of_session):
-            study_session_end = first_session.addSecs(60*study_length*(i+1)+60*break_length*i)
-            break_session_end = study_session_end.addSecs(60*break_length)
-            countdown_list.append(f'{study_session_end.toString("hh:mm")} ')
-            countdown_list.append(f'{break_session_end.toString("hh:mm")}r ')
+        for i in range(self.n_of_session):
+            study_session_end = self.first_session.addSecs(60*self.study_length*(i+1)+60*self.break_length*i)
+            break_session_end = study_session_end.addSecs(60*self.break_length)
+            if self.reasonable_timerange(study_session_end):
+                countdown_list.append(f'{study_session_end.toString("hh:mm")} ')
+            if self.reasonable_timerange(break_session_end):
+                countdown_list.append(f'{break_session_end.toString("hh:mm")}r ')
 
 
         task_timer = asyncio.create_task(self.timer_task(countdown_list))
 
-        # task_study_music = asyncio.create_task(self.music_task())
 
-
+    def reasonable_timerange(self, time):
+        minute_max_var = (self.study_length + self.break_length) * self.n_of_session
+        minute_diff = self.now.secsTo(time)/60
+        if minute_diff < -(6 * 60):
+            return True
+        return 0 < minute_diff < minute_max_var
 
     async def timer_task(self, cd_list):
         for item in cd_list:
             item = item.strip()
+            then_h, then_m = item.split(':')
+            now = QTime.currentTime()
+            try:
+                then = QTime(int(then_h), int(then_m), 0)
+            except ValueError:
+                then = QTime(int(then_h), int(then_m[:-1]), 0)
+            session = now.secsTo(then)
+            session = session + 86400 if session < 0 else session
             if item[-1] != 'r':
                 # if study time, play lofi
-                then_h, then_m = item.split(':')
-                now = QTime.currentTime()
-                then = QTime(int(then_h),int(then_m), 0)
-                session = now.secsTo(then)
-                session = session + 86400 if session < 0 else session
                 task_lofi = asyncio.create_task(lofiplayer.player_wrapper(session_length=session))
+
+            elif item[-1] == 'r':
+                # if rest time, play music from nb
+                task_nb_music = asyncio.create_task(nb_con.music_player_wrapper(session_length=session))
+                # await task_nb_music
 
             task = asyncio.create_task(main.a_countdown(item, time_table=True))
             await task
