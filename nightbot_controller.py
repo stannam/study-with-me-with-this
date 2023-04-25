@@ -3,8 +3,9 @@ from os import path
 import pickle
 import asyncio
 
-driver = webdriver.Chrome(executable_path='resource/chromedriver')
+# driver = webdriver.Chrome(executable_path='resource/chromedriver')
 async def initialize():
+    return
     cookie_matters()
     driver.get('https://nightbot.tv/song_requests')
     driver.implicitly_wait(time_to_wait=5)
@@ -19,6 +20,7 @@ async def initialize():
 
 async def music_player_wrapper(session_length):
     # session_length in seconds
+    return
     play_btn = driver.find_element_by_xpath('//*[@id="page-wrapper"]/div[2]/ui-view/player-controls/div/div/div[1]/button[1]')
     play_btn.click()
     await asyncio.sleep(session_length - 1)
@@ -26,6 +28,7 @@ async def music_player_wrapper(session_length):
 
 
 def cookie_matters(loadonly=True):
+    return
     driver.get('https://twitch.tv/404')
     if path.isfile('log/twitch_cookie.dat'):
         f = open('log/twitch_cookie.dat', 'rb')

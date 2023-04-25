@@ -31,7 +31,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # initial todolist, timer and now_playing
         self.todo_load()
         self.timer_reset()
-        self.nb_start()
+        #self.nb_start()  #nightbot deactivated
         f = open('log/played_lofi.txt', 'a+', encoding="utf-8")
         f.close()
 
@@ -45,7 +45,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.start_button.clicked.connect(self.timer_start)
 
         # start nb now_playing button
-        self.nb_music_button.clicked.connect(self.nb_start)
+        # self.nb_music_button.clicked.connect(self.nb_start)
 
         # todolist default
         self.apply_default_button.clicked.connect(self.default_todo)
@@ -145,10 +145,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.change_current_doing()  # update 'currently doing' prompt just in case
 
     def nb_start(self):
+        return  # disabling nightbot controller
         asyncio.create_task(self.s_nb_start())
         asyncio.create_task(nb_con.initialize())
 
     async def s_nb_start(self):
+        return  # disabling nightbot controller
         command = 'resource\\nowplaying.bat'
         subprocess.Popen(command, shell=True)
         await asyncio.sleep(0.5)
