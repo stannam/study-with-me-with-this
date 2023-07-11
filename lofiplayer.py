@@ -38,6 +38,6 @@ async def player():
         pl = pyglet.media.Player()
         x = pyglet.media.load(f'{lofipath}{to_play}', streaming=False)
         pl.queue(x)
-        pl.volume = 0.3
+        pl.volume = 0.6
         pl.play()
         await asyncio.sleep(x.duration+2)

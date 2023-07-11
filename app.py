@@ -32,8 +32,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.todo_load()
         self.timer_reset()
         #self.nb_start()  #nightbot deactivated
-        f = open('log/played_lofi.txt', 'a+', encoding="utf-8")
+        played_lofi_path = os.path.join(os.getcwd(),'log','played_lofi.txt')
+        f = open(played_lofi_path, 'a+', encoding="utf-8")
         f.close()
+
+        # volume control (volume up/down/mute)
+        self.volume_up.clicked.connect(lambda: self.volume_con('up'))
+        self.volume_down.clicked.connect(lambda: self.volume_con('down'))
+        self.volume_mute.clicked.connect(lambda: self.volume_con('mute'))
 
         # default timer button
         self.default_button.clicked.connect(self.timer_reset)
@@ -88,7 +94,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         spacing_length = 18 - len(todo_content)
         spacing = ' ' * spacing_length if spacing_length > 0 else '         '
 
-        with open('log/currently_doing.txt', 'w+', encoding="utf-8") as f:
+        currently_doing_path = os.path.join(os.getcwd(),'log','currently_doing.txt')
+        with open(currently_doing_path, 'w+', encoding="utf-8") as f:
             f.write(todo_content+spacing)
 
     def default_todo(self):
@@ -108,9 +115,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.timerEdit.setTime(QTime.currentTime())
 
     def todo_load(self):
-        if not os.path.isfile('log/todolist.txt'):
+        todolist_path = os.path.join(os.getcwd(),'log','todolist.txt')
+        if not os.path.isfile(todolist_path):
             return
-        with open('log/todolist.txt', 'r', encoding="utf-8") as f:
+        with open(todolist_path, 'r', encoding="utf-8") as f:
             lines = f.readlines()
             for index, line in enumerate(lines[1:-1]):
                 file_todo_state = line[0]
@@ -139,8 +147,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             todo_list += f'{todo_text}\n'
         todo_list += '                                                  '
-
-        with open('log/todolist.txt', 'w+', encoding="utf-8") as f:
+        todolist_path = os.path.join(os.getcwd(),'log','todolist.txt')
+        with open(todolist_path, 'w+', encoding="utf-8") as f:
             f.write(todo_list)
         self.change_current_doing()  # update 'currently doing' prompt just in case
 
@@ -154,6 +162,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         command = 'resource\\nowplaying.bat'
         subprocess.Popen(command, shell=True)
         await asyncio.sleep(0.5)
+
+    def volume_con(self, con):
+        if con == 'up':
+            pass
+        elif con == 'down':
+            pass
+        else:
+            pass
+
 
     def closeEvent(self, event):
         current_task_set = asyncio.all_tasks()
@@ -255,12 +272,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 then = QTime(int(then_h), int(then_m[:-1]), 0)
             session = now.secsTo(then)
             session = session + 86400 if session < 0 else session
+
+            sr_path = os.path.join(os.getcwd(),'log', 'study_rest.txt') # path for 'study_rest.txt'
             if item[-1] != 'r':
-                # if study time, play lofi
+                # if study time, update 'study_rest.txt' as 's' and play lofi
+                with open(sr_path, 'w+', encoding="utf-8") as f:
+                    f.write('s')
                 task_lofi = asyncio.create_task(lofiplayer.player_wrapper(session_length=session))
 
             elif item[-1] == 'r':
-                # if rest time, play music from nb
+                # if rest time, update 'study_rest.txt' as 'r' and play music from nb
+                with open(sr_path, 'w+', encoding="utf-8") as f:
+                    f.write('r')
                 task_nb_music = asyncio.create_task(nb_con.music_player_wrapper(session_length=session))
                 # await task_nb_music
 
