@@ -24,12 +24,50 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Study with me")
-        system = sys.platform.startswith('win')
+        system = sys.platform
         if system.startswith('win'):
+            self.os = 'win'
             self.setFixedSize(1600, 900)  # Set fixed window size
             self.setWindowFlag(Qt.WindowStaysOnTopHint)  # Make window always on top
+            self.heights = [ # total = 900px
+                            150,  # local time clock
+                            220,  # timetable
+                            50,  # study_time / break_time
+                            80,  # count down
+                            400]  # to-do list
+            self.letter_limit = 112
+            self.styles = {
+                "currently_doing_label": "color: white; font-weight: bold; font-size: 24px;",
+                "currently_doing_text": "color: white; font-size: 20px;",
+                "current_music_label": "color: white; font-weight: bold; font-size: 24px;",
+                "current_music_text": "color: white; font-size: 18px;",
+                "study_break_label": "color: white; font-weight: bold; font-family: NanumBarunPen; font-size: 30px;",
+                "study_down_label": "color: white; font-weight: bold; font-family: NanumBarunPen; font-size: 90px;",
+                "rest_down_label": "color: yellow; font-weight: bold; font-family: NanumBarunPen; font-size: 90px;",
+                "todolist_label": "color: white; font-family: NanumBarunPen; font-size: 30px;",
+
+            }
         elif system.startswith('darwin'):
-            self.setFixedSize(800, 450)  # Set fixed window size
+            self.os = 'mac'
+            self.setFixedSize(400, 700)  # Set fixed window size
+            self.styles = {
+                "currently_doing_label": "color: white; font-weight: bold; font-size: 14px;",
+                "currently_doing_text": "color: white; font-size: 12px;",
+                "current_music_label": "color: white; font-weight: bold; font-size: 14px;",
+                "current_music_text": "color: white; font-size: 12px;",
+                "study_break_label": "color: white; font-weight: bold; font-family: NanumBarunPenOTF; font-size: 20px;",
+                "study_down_label": "color: white; font-weight: bold; font-family: NanumBarunPenOTF; font-size: 60px;",
+                "rest_down_label": "color: yellow; font-weight: bold; font-family: NanumBarunPenOTF; font-size: 60px;",
+                "todolist_label": "color: white; font-family: NanumBarunPenOTF; font-size: 14px;",
+
+            }
+            self.heights = [  # total = 630px out of 700px
+                            110,  # local time clock
+                            290,  # timetable
+                            20,  # study_time / break_time
+                            60,  # count down
+                            150]  # to-do list
+            self.letter_limit = 80
 
         self.camera = None  # Define the camera attribute
         self.viewfinder = None  # Define the viewfinder attribute
@@ -56,7 +94,7 @@ class MainWindow(QMainWindow):
         self.camera = QCamera(camera_combo.currentData())
         self.camera.setCaptureMode(QCamera.CaptureViewfinder)
         self.viewfinder = QCameraViewfinder()
-        self.viewfinder.setFixedWidth(1120)  # Set the fixed width of the viewfinder
+        #self.viewfinder.setFixedWidth(50)  # Set the fixed width of the viewfinder
         self.camera.setViewfinder(self.viewfinder)
         self.camera.start()
         self.camera_layout.addWidget(self.viewfinder)  # Remove the stretch factor parameter
@@ -71,12 +109,12 @@ class MainWindow(QMainWindow):
 
         # Left sub-part with fixed text "currently doing:"
         currently_doing_label = QLabel("Currently Doing:")
-        currently_doing_label.setStyleSheet("color: white; font-weight: bold; font-size: 24px;")
+        currently_doing_label.setStyleSheet(self.styles['currently_doing_label'])
         ticker1_layout.addWidget(currently_doing_label, 2)  # Allocate 20% width
 
         # Right sub-part with content
         self.currently_doing_text = QLabel()
-        self.currently_doing_text.setStyleSheet("color: white; font-size: 20px;")
+        self.currently_doing_text.setStyleSheet(self.styles["currently_doing_text"])
         ticker1_layout.addWidget(self.currently_doing_text, 8)  # Allocate 80% width
 
         # add ticker1 (currently doing) to ticker_layout
@@ -88,12 +126,12 @@ class MainWindow(QMainWindow):
 
         # Left sub-part with fixed text "current music:"
         current_music_label = QLabel("Current music:")
-        current_music_label.setStyleSheet("color: white; font-weight: bold; font-size: 24px;")
+        current_music_label.setStyleSheet(self.styles["current_music_label"])
         ticker2_layout.addWidget(current_music_label, 2)  # Allocate 20% width
 
         # Right sub-part with actual music title
         self.current_music_text = QLabel()
-        self.current_music_text.setStyleSheet("color: white; font-size: 18px;")
+        self.current_music_text.setStyleSheet(self.styles["current_music_text"])
         ticker2_layout.addWidget(self.current_music_text, 8)  # Allocate 80% width
 
         # add ticker2 (current music) to ticker_layout
@@ -102,7 +140,8 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(camera_label, 9)  # Allocate 90% of vertical space
         left_layout.addWidget(ticker_label, 1)  # Allocate 10% of vertical space
 
-        main_layout.addWidget(left_panel, 8)  # Allocate 80% width
+        if self.os == "win":
+            main_layout.addWidget(left_panel, 7)  # Allocate 70% width
 
         # Create the right panel with four parts
         right_panel = QWidget(self)
@@ -110,11 +149,7 @@ class MainWindow(QMainWindow):
         right_panel.setStyleSheet("background-color: rgb(27, 27, 27);")  # Set the background color to (27, 27, 27)
 
         # Set the heights of the sub-panels
-        heights = [150,     # local time clock
-                   220,     # timetable
-                   50,      # study_time / break_time
-                   80,      # count down
-                   400]     # to-do list
+        heights = self.heights
 
         # Right sub-part with content from "clock.html" file
         clock_view = QWebEngineView()
@@ -133,7 +168,7 @@ class MainWindow(QMainWindow):
 
         # Right sub-part for showing either 'study time' or 'break time'
         self.study_break_label = QLabel('STUDY TIME')
-        self.study_break_label.setStyleSheet("color: white; font-weight: bold; font-family: NanumBarunPen; font-size: 30px;")
+        self.study_break_label.setStyleSheet(self.styles["study_break_label"])
         self.study_break_label.setAlignment(Qt.AlignCenter)
         self.study_break_label.setMinimumHeight(heights[2])
         self.study_break_label.setMaximumHeight(heights[2])
@@ -141,7 +176,7 @@ class MainWindow(QMainWindow):
 
         # Right sub-part with content from "[STUDY]_DOWN.txt" file
         self.study_down_label = QLabel(read_resource('[STUDY]_DOWN.txt'))
-        self.study_down_label.setStyleSheet("color: white; font-weight: bold; font-family: NanumBarunPen; font-size: 90px;")
+        self.study_down_label.setStyleSheet(self.styles["study_down_label"])
         self.study_down_label.setAlignment(Qt.AlignCenter)
         self.study_down_label.setMinimumHeight(heights[3])
         self.study_down_label.setMaximumHeight(heights[3])
@@ -149,12 +184,16 @@ class MainWindow(QMainWindow):
 
         # Right sub-part with content from "todolist.txt" file
         self.todolist_label = QLabel(read_resource('todolist.txt'))
-        self.todolist_label.setStyleSheet("color: white; font-family: NanumBarunPen; font-size: 30px;")
+        self.todolist_label.setStyleSheet(self.styles["todolist_label"])
         self.todolist_label.setMinimumHeight(heights[4])
         self.todolist_label.setMaximumHeight(heights[4])
         right_layout.addWidget(self.todolist_label)
+        if self.os == "mac":
+            right_layout.addWidget(ticker_label,1)
+            main_layout.addWidget(right_panel, 4)  # Allocate 40% width
+        else:
+            main_layout.addWidget(right_panel, 3)  # Allocate 30% width
 
-        main_layout.addWidget(right_panel, 3)  # Allocate 30% width
 
 
         # Create a QTimer to update the labels every 500 milliseconds (half a second)
@@ -183,8 +222,8 @@ class MainWindow(QMainWindow):
 
     def update_labels(self):
         # Update the contents of the labels
-        self.currently_doing_text.setText(read_resource('currently_doing.txt')[:110])
-        self.current_music_text.setText(read_resource('current_lofi.txt')[:110])
+        self.currently_doing_text.setText(read_resource('currently_doing.txt')[:self.letter_limit])
+        self.current_music_text.setText(read_resource('current_lofi.txt')[:self.letter_limit])
         self.todolist_label.setText(read_resource('todolist.txt'))
         self.update_study_rest()
 
@@ -195,14 +234,12 @@ class MainWindow(QMainWindow):
         if 'r' in study_or_rest:
             countdown_file = '[BREAK]_TIME.txt'
             study_break = 'BREAK TIME'
-            self.study_down_label.setStyleSheet(
-                "color: yellow; font-weight: bold; font-family: NanumBarunPen; font-size: 80px;")
+            self.study_down_label.setStyleSheet(self.styles["rest_down_label"])
 
         else:
             countdown_file = '[STUDY]_DOWN.txt'
             study_break = 'STUDY TIME'
-            self.study_down_label.setStyleSheet(
-                "color: white; font-weight: bold; font-family: NanumBarunPen; font-size: 90px;")
+            self.study_down_label.setStyleSheet(self.styles["study_down_label"])
         self.study_down_label.setText(read_resource(countdown_file))
         self.study_break_label.setText(study_break)
 

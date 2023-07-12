@@ -3,7 +3,7 @@ import sys
 import os
 import asyncio
 import qasync
-import psutil
+# import psutil
 from PyQt5.QtWidgets import QAction
 
 import nightbot_controller as nb_con
