@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
             }
         elif system.startswith('darwin'):
             self.os = 'mac'
-            self.setFixedSize(400, 700)  # Set fixed window size
+            self.setFixedSize(300, 700)  # Set fixed window size
             self.styles = {
                 "currently_doing_label": "color: white; font-weight: bold; font-size: 14px;",
                 "currently_doing_text": "color: white; font-size: 12px;",
@@ -62,11 +62,11 @@ class MainWindow(QMainWindow):
 
             }
             self.heights = [  # total = 630px out of 700px
-                            110,  # local time clock
-                            290,  # timetable
-                            20,  # study_time / break_time
+                            90,  # local time clock
+                            300,  # timetable
+                            40,  # study_time / break_time
                             60,  # count down
-                            150]  # to-do list
+                            140]  # to-do list
             self.letter_limit = 80
 
         self.camera = None  # Define the camera attribute
