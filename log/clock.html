@@ -1,32 +1,61 @@
-<!DOCTYPE>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
     body {
         background-color: rgba(24, 24, 24, 255);
-        font-family: 'NanumSquare', serif;
+        font-family: 'Nanum Gothic', serif;
         color: white
     }
     table {
         border: 0;
-        font-size:10vw;
-        font-weight: bold;
         text-align: center;
         width: 100%;
         border-spacing: 0;
         padding: 0;
-        white-space:pre
-
+        white-space: pre;
     }
-    iframe {
-        border-width: 0px;
-        max-height: 1.6em;
+    td {
+        font-size: 10vw;
+        font-weight: bold;
+    }
+    .local-time {
+        font-size: 8vw;
+        font-weight: bold;
     }
 </style>
+      <script>
+    // Function to update the local time
+    function updateLocalTime() {
+      var currentTime = new Date();
+      var hours = currentTime.getHours();
+      var minutes = currentTime.getMinutes();
+      var seconds = currentTime.getSeconds();
+
+      // Add leading zeros if necessary
+      hours = (hours < 10 ? "0" : "") + hours;
+      minutes = (minutes < 10 ? "0" : "") + minutes;
+      seconds = (seconds < 10 ? "0" : "") + seconds;
+
+      // Build the time string
+      var timeString = hours + ":" + minutes + ":" + seconds;
+
+      // Update the local time element
+      var localTimeElement = document.getElementById("local-time");
+      localTimeElement.textContent = timeString;
+
+      // Update the time every second
+      setTimeout(updateLocalTime, 1000);
+    }
+
+    // Call the updateLocalTime function when the page loads
+    window.onload = updateLocalTime;
+  </script>
 </head>
 <body>
 <table>
-    <tr><td>Local time</td></tr><tr><td><iframe src="https://gistcdn.githack.com/sam0737/a0ee8ca253fc5c84b2aa2ac018f7b8ad/raw/94af10ef67d6c7e48295efaa43cdd2847d2fd884/clock.html?
-style=font: bold 50px monospace; text-align: center; color: white; background-color: rgba(24, 24, 24, 1)&format=HH:mm:ss" frameborder="1"></iframe></td></tr>
+    <tr><td>Local time</td></tr><tr><td><div class="local-time" id="local-time"></div></td></tr>
 </table>
 </body>
+</html>
