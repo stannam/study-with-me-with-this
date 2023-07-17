@@ -1,3 +1,0 @@
-<!DOCTYPE html>
-<html><head><!--<meta http-equiv="refresh" content="5"> --><style>body {background-color: rgba(24, 24, 24, 255);font-family: 'NanumSquare', serif}table {border: 0px;font-size: 30px;font-weight: bold;text-align: left;width: 100%;border-spacing: 0;padding: 0px;white-space:pre}tr {color: white;}tr.highlighted {background-color: white; color: black;}</style></head><body><script type="text/javascript" src="refresh.js"></script><table>
-</table></body></html>
