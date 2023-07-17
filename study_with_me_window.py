@@ -30,11 +30,11 @@ class MainWindow(QMainWindow):
             self.setFixedSize(1600, 900)  # Set fixed window size
             self.setWindowFlag(Qt.WindowStaysOnTopHint)  # Make window always on top
             self.heights = [ # total = 900px
-                            150,  # local time clock
-                            220,  # timetable
+                            130,  # local time clock
+                            260,  # timetable
                             50,  # study_time / break_time
                             80,  # count down
-                            400]  # to-do list
+                            380]  # to-do list
             self.letter_limit = 112
             self.styles = {
                 "currently_doing_label": "color: white; font-weight: bold; font-size: 24px;",
@@ -249,4 +249,3 @@ if __name__ == '__main__':
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
-

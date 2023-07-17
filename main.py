@@ -207,37 +207,58 @@ def update_timetable():
 def write_html(tt_list):
     try:
         meta_data = open('./log/tb_metadata.txt', 'r', encoding='utf-8-sig')
-        lines = meta_data.readlines()
+        template_lines = meta_data.readlines()
         meta_data.close()
 
     except FileNotFoundError:
-        lines = ['<!DOCTYPE html>\n', '<html><head>'
-                                      # '<meta http-equiv="refresh" content="5">'
-                                      '<style>body {background-color: rgba(24, 24, 24, 255);'
-                                      'font-family: \'NanumSquare\', serif}'
-                                      'table {border: 0px;font-size: 30px;font-weight: bold;text-align: left;'
-                                      'width: 100%;border-spacing: 0;padding: 0px;white-space:pre}tr {color: white;}'
-                                      'tr.highlighted {background-color: white; color: black;}'
-                                      '</style></head><body>'
-                                      '<script type="text/javascript" src="refresh.js"></script>'
-                                      '<table>', '</table></body></html>']
+        template_lines = ['<!DOCTYPE html>\n',
+                          '<html>\n<head>\n'
+                          # '<meta http-equiv="refresh" content="5">'
+                          '  <style>\n'
+                          '      @import url(\'https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap\');\n'
+                          '          body {\n'
+                          '              background-color: rgba(24, 24, 24, 255);\n'
+                          '              font-family: \'Gowun Dodum\', sans-serif;\n'
+                          '          }\n'
+                          '          table {\n'
+                          '              border: 0px;\n'
+                          '              font-size: 7vw;\n'
+                          '              font-weight: bold;\n'
+                          '              text-align: left;\n'
+                          '              width: 100%;\n'
+                          '              border-spacing: 0;\n'
+                          '              padding: 0px;\n'
+                          '              white-space:pre;\n'
+                          '          }\n'
+                          '          tr {color: white;}\n'
+                          '          tr.highlighted {background-color: white; color: black;}\n'
+                          '  </style>\n'
+                          '</head>\n\n'
+                          '<body>\n'
+                          '  <script type="text/javascript" src="refresh.js"></script>\n'
+                          '  <table>\n',
+                          '  </table>\n</body>\n</html>'
+                          ]
         meta_data = open('./log/tb_metadata.txt', 'w+', encoding='utf-8-sig')
-        meta_data.writelines(lines)
+        meta_data.writelines(template_lines)
+        meta_data.close()
+        meta_data = open('./log/tb_metadata.txt', 'r', encoding='utf-8-sig')
+        template_lines = meta_data.readlines()
         meta_data.close()
 
-    header = lines[0:2]
-    tail = lines[2]
+    header = template_lines[:-3]
+    tail = template_lines[-3:]
 
-    lines.append(''.join(header))
+    lines = [''.join(header)]
     for tt_line in tt_list:
         session_start_time, session_end_time = get_start_end_times(tt_line)
 
         if session_start_time <= datetime.now() <= session_end_time:
-            lines.append("<tr class='highlighted'><td>")
+            lines.append("      <tr class='highlighted'>\n          <td>")
         else:
-            lines.append("<tr><td>")
-        lines.append(tt_line + '</td></tr>')
-    lines.append(tail)
+            lines.append("      <tr>\n          <td>")
+        lines.append(tt_line + '</td>\n      </tr>')
+    lines.append(''.join(tail))
 
     with open('./log/timetable.html', 'w+', encoding='utf-8-sig') as tt_html:
         tt_html.writelines(lines)
@@ -373,5 +394,4 @@ def main(args, t=' '):
 
 # function call
 if __name__ == '__main__':
-    ## main(args=sys.argv)
-    ring_bell()
+    main(args=sys.argv)
