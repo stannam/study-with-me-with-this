@@ -25,6 +25,16 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Study with me")
         system = sys.platform
+
+        try:
+            need_camera = sys.argv[1]
+            if need_camera.lower() != 'true':
+                self.need_camera = False
+            else:
+                self.need_camera = True
+        except IndexError:
+            self.need_camera = False
+
         if system.startswith('win'):
             self.os = 'win'
             self.setFixedSize(1600, 900)  # Set fixed window size
@@ -45,8 +55,8 @@ class MainWindow(QMainWindow):
                 "study_down_label": "color: white; font-weight: bold; font-family: NanumBarunPen; font-size: 90px;",
                 "rest_down_label": "color: yellow; font-weight: bold; font-family: NanumBarunPen; font-size: 90px;",
                 "todolist_label": "color: white; font-family: NanumBarunPen; font-size: 30px;",
-
             }
+
         elif system.startswith('darwin'):
             self.os = 'mac'
             self.setFixedSize(300, 700)  # Set fixed window size
@@ -69,9 +79,6 @@ class MainWindow(QMainWindow):
                             140]  # to-do list
             self.letter_limit = 80
 
-        self.camera = None  # Define the camera attribute
-        self.viewfinder = None  # Define the viewfinder attribute
-
         # Create the main widget and layout
         main_widget = QWidget(self)
         self.setCentralWidget(main_widget)
@@ -82,23 +89,26 @@ class MainWindow(QMainWindow):
         left_layout = QVBoxLayout(left_panel)
         left_panel.setStyleSheet("background-color: rgb(0, 0, 0);")  # Set the background color to black
 
-        camera_label = QWidget(self)
-        self.camera_layout = QVBoxLayout(camera_label)
+        if self.need_camera:
+            self.camera = None  # Define the camera attribute
+            self.viewfinder = None  # Define the viewfinder attribute
 
-        # Initialize the camera selection combo box
-        camera_combo = QComboBox(self)  # Move camera_combo to be part of the main window
-        camera_combo.currentIndexChanged.connect(self.on_camera_selected)
-        self.populate_camera_combo(camera_combo)
+            camera_label = QWidget(self)
+            self.camera_layout = QVBoxLayout(camera_label)
 
-        # Initialize and access the selected camera
-        self.camera = QCamera(camera_combo.currentData())
-        self.camera.setCaptureMode(QCamera.CaptureViewfinder)
-        self.viewfinder = QCameraViewfinder()
-        #self.viewfinder.setFixedWidth(50)  # Set the fixed width of the viewfinder
-        self.camera.setViewfinder(self.viewfinder)
-        self.camera.start()
-        self.camera_layout.addWidget(self.viewfinder)  # Remove the stretch factor parameter
-        self.camera_layout.addWidget(camera_combo)  # Add camera_combo to the camera_layout
+            # Initialize the camera selection combo box
+            camera_combo = QComboBox(self)  # Move camera_combo to be part of the main window
+            camera_combo.currentIndexChanged.connect(self.on_camera_selected)
+            self.populate_camera_combo(camera_combo)
+
+            # Initialize and access the selected camera
+            self.camera = QCamera(camera_combo.currentData())
+            self.camera.setCaptureMode(QCamera.CaptureViewfinder)
+            self.viewfinder = QCameraViewfinder()
+            self.camera.setViewfinder(self.viewfinder)
+            self.camera.start()
+            self.camera_layout.addWidget(self.viewfinder)  # Remove the stretch factor parameter
+            self.camera_layout.addWidget(camera_combo)  # Add camera_combo to the camera_layout
 
         ticker_label = QWidget(self)
         ticker_layout = QVBoxLayout(ticker_label)
@@ -137,8 +147,11 @@ class MainWindow(QMainWindow):
         # add ticker2 (current music) to ticker_layout
         ticker_layout.addLayout(ticker2_layout)
 
-        left_layout.addWidget(camera_label, 9)  # Allocate 90% of vertical space
-        left_layout.addWidget(ticker_label, 1)  # Allocate 10% of vertical space
+        if self.need_camera:
+            left_layout.addWidget(camera_label, 9)  # Allocate 90% of vertical space
+            left_layout.addWidget(ticker_label, 1)  # Allocate 10% of vertical space
+        else:
+            left_layout.addWidget(ticker_label)
 
         if self.os == "win":
             main_layout.addWidget(left_panel, 7)  # Allocate 70% width
