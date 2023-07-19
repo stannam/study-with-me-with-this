@@ -1,6 +1,6 @@
 import sys
 from os import getcwd, path, name
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
@@ -178,6 +178,12 @@ class MainWindow(QMainWindow):
         timetable_view.setMaximumHeight(heights[1])
         right_layout.addWidget(timetable_view)
 
+        # Button to refresh "timetable.html" file
+        tt_refresh_button = QPushButton("Refresh timetable")
+        tt_refresh_button.clicked.connect(lambda: timetable_view.load(read_resource('timetable.html')))
+        tt_refresh_button.setMinimumHeight(20)
+        tt_refresh_button.setStyleSheet("background-color: rgb(50, 50, 50); color: white;")
+        right_layout.addWidget(tt_refresh_button)
 
         # Right sub-part for showing either 'study time' or 'break time'
         self.study_break_label = QLabel('STUDY TIME')
