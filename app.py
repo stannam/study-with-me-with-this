@@ -7,7 +7,7 @@ import qasync
 from PyQt5.QtWidgets import QAction
 
 import nightbot_controller as nb_con
-import lofiplayer
+from lofiplayer2 import MusicPlayer
 import main
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QTime
@@ -16,6 +16,7 @@ from PyQt5.QtCore import QTime
 from MainWindow import Ui_MainWindow
 
 # use 'pyuic5 resource/mainwindow.ui -o MainWindow.py' on terminal
+music_player = MusicPlayer()
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
@@ -165,11 +166,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def volume_con(self, con):
         if con == 'up':
-            pass
+            music_player.volume_up()
         elif con == 'down':
-            pass
+            music_player.volume_down()
         else:
-            pass
+            music_player.toggle_mute()
 
 
     def closeEvent(self, event):
@@ -273,15 +274,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             session = now.secsTo(then)
             session = session + 86400 if session < 0 else session
 
-            sr_path = os.path.join(os.getcwd(),'log', 'study_rest.txt') # path for 'study_rest.txt'
+            sr_path = os.path.join(os.getcwd(),'log', 'study_rest.txt')  # path for 'study_rest.txt'
             if item[-1] != 'r':
                 # if study time, update 'study_rest.txt' as 's' and play lofi
                 with open(sr_path, 'w+', encoding="utf-8") as f:
                     f.write('s')
-                task_lofi = asyncio.create_task(lofiplayer.player_wrapper(session_length=session))
+                music_play = asyncio.create_task(music_player.play_music())
 
             elif item[-1] == 'r':
                 # if rest time, update 'study_rest.txt' as 'r' and play music from nb
+                music_player.stop_music()
                 with open(sr_path, 'w+', encoding="utf-8") as f:
                     f.write('r')
                 task_nb_music = asyncio.create_task(nb_con.music_player_wrapper(session_length=session))
