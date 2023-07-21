@@ -279,7 +279,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 # if study time, update 'study_rest.txt' as 's' and play lofi
                 with open(sr_path, 'w+', encoding="utf-8") as f:
                     f.write('s')
-                music_play = asyncio.create_task(music_player.play_music())
+                music_play = asyncio.create_task(music_player.player_wrapper(session))
 
             elif item[-1] == 'r':
                 # if rest time, update 'study_rest.txt' as 'r' and play music from nb

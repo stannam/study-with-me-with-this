@@ -5,16 +5,6 @@ import os
 import pyglet
 import sys
 from datetime import datetime, timedelta
-from PyQt5.QtWidgets import QDialog, QApplication
-from MainWindow import Ui_MainWindow
-
-
-#  class AppWindow(QDialog):
-#      def __init__(self):
-#          super().__init__()
-#          self.ui = Ui_MainWindow()
-#          self.ui.setupUi(self)
-#          self.show()
 
 # define the countdown func.
 def countdown(t, breaktime=False, time_table=False):
@@ -333,6 +323,7 @@ def ring_bell():
     bell = pyglet.media.Player()
     x = pyglet.media.load(bell_path, streaming=False)
     bell.queue(x)
+    bell.volume = 0.6
     bell.play()
     time.sleep(x.duration)
 

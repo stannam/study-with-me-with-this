@@ -20,9 +20,19 @@ class MusicPlayer:
 
     async def player_wrapper(self, session_length):
         # session_length in seconds
-        task_playingmusic = asyncio.create_task(self.play_music())
-        await asyncio.sleep(session_length - 1)
-        music_player.stop_music()
+        try:
+            # run the task play_music() with session_length as timeout
+            await asyncio.wait_for(self.play_music(), timeout=session_length - 1)
+        except asyncio.TimeoutError:
+            print('killed music_player')
+        else:
+            pass
+
+        # In case the player does not end after a study session, double_kill with stop_music()
+        try:
+            music_player.stop_music()
+        except NameError:
+            pass
 
     async def play_music(self):
         played_songs = []
@@ -70,14 +80,13 @@ class MusicPlayer:
         if self.player is not None:
             self.volume = min(self.volume * 1.1, 1.0)  # Volume increase 10%
             self.player.volume = self.volume
+            self.is_muted = False
 
     def volume_down(self):
         if self.player is not None:
             self.volume = max(self.volume * 0.9, 0.0)  # Volume decrease 10%
             self.player.volume = self.volume
-
-    def is_playing_music(self):
-        return self.is_playing
+            self.is_muted = False
 
     def current_track_info(self):
         if self.is_playing and self.player is not None:
