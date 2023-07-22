@@ -70,7 +70,6 @@ class MusicPlayer:
             self.player.pause()
             self.is_playing = False
 
-
     def toggle_mute(self):
         if self.player is not None:
             self.player.volume = 0 if not self.is_muted else self.volume
@@ -87,6 +86,9 @@ class MusicPlayer:
             self.volume = max(self.volume * 0.9, 0.0)  # Volume decrease 10%
             self.player.volume = self.volume
             self.is_muted = False
+
+    def get_volume(self):
+        return self.volume
 
     def current_track_info(self):
         if self.is_playing and self.player is not None:

@@ -18,6 +18,15 @@ from MainWindow import Ui_MainWindow
 # use 'pyuic5 resource/mainwindow.ui -o MainWindow.py' on terminal
 music_player = MusicPlayer()
 
+
+# show help_bubble when hovering over a button
+def show_help_bubble(widget, text):
+    # Get the global position of the widget
+    pos = widget.mapToGlobal(widget.rect().topRight())
+
+    # Display the tooltip at the widget's position
+    QtWidgets.QToolTip.showText(pos, text, widget)
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -37,10 +46,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         f = open(played_lofi_path, 'a+', encoding="utf-8")
         f.close()
 
-        # volume control (volume up/down/mute)
+        # volume control (volume up/down/mute) when clicked
         self.volume_up.clicked.connect(lambda: self.volume_con('up'))
         self.volume_down.clicked.connect(lambda: self.volume_con('down'))
         self.volume_mute.clicked.connect(lambda: self.volume_con('mute'))
+
+        # volume control (show current volume) when hovered over
+        self.volume_up.enterEvent = lambda event: show_help_bubble(self.volume_up,
+                                                                   f'Volume: {music_player.get_volume() * 100:.2f}%')
+        self.volume_down.enterEvent = lambda event: show_help_bubble(self.volume_down,
+                                                                     f'Volume: {music_player.get_volume() * 100:.2f}%')
+        self.volume_mute.enterEvent = lambda event: show_help_bubble(self.volume_mute,
+                                                                     f'Volume: {music_player.get_volume() * 100:.2f}%')
 
         # default timer button
         self.default_button.clicked.connect(self.timer_reset)
