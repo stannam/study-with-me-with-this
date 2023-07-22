@@ -38,7 +38,8 @@ class MusicPlayer:
         played_songs = []
         played_songs_path = os.path.join('log','played_lofi.txt')
         with open(played_songs_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()[-50:]
+            n_lofi = len(self.music_files)  # number of lofi songs
+            lines = f.readlines()[-(n_lofi * 80):]
             for l in lines:
                 played_songs.append(l.strip())
         if not self.is_playing:
