@@ -4,7 +4,7 @@ import os
 import asyncio
 import qasync
 # import psutil
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QMessageBox
 
 import nightbot_controller as nb_con
 from lofiplayer2 import MusicPlayer
@@ -191,8 +191,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
     def closeEvent(self, event):
-        current_task_set = asyncio.all_tasks()
-        asyncio.create_task(self.cancel_existing_tasks(current_task_set))
+        reply = QMessageBox.question(self, "Exit", "Are you sure?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No,)
+
+        if reply == QMessageBox.Yes:
+            current_task_set = asyncio.all_tasks()
+            asyncio.create_task(self.cancel_existing_tasks(current_task_set))
+            event.accept()
+        else:
+            event.ignore()
         # parent_pid = os.getpid()
         # parent = psutil.Process(parent_pid)
         # children = parent.children(recursive=True)
