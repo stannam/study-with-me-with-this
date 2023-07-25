@@ -62,7 +62,7 @@ class MusicPlayer:
                 self.player = pyglet.media.Player()
                 source = pyglet.media.load(os.path.join("resource", "sound", "lofi", music_file))
                 self.player.queue(source)
-                self.player.volume = self.volume
+                self.player.volume = self.volume if not self.is_muted else 0
                 self.player.play()
                 await asyncio.sleep(source.duration + 2)
 
@@ -84,12 +84,12 @@ class MusicPlayer:
 
     def volume_down(self):
         if self.player is not None:
-            self.volume = max(self.volume * 0.9, 0.0)  # Volume decrease 10%
+            self.volume = max(self.volume * 0.9, 0.05)  # Volume decrease 10%
             self.player.volume = self.volume
             self.is_muted = False
 
     def get_volume(self):
-        return self.volume
+        return self.volume if self.player is None else self.player.volume
 
     def current_track_info(self):
         if self.is_playing and self.player is not None:
