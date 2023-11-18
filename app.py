@@ -239,7 +239,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def timer_start(self):
         # when 'start timer' button is clicked, start the timer
-        current_task_set = asyncio.all_tasks()  # get all previous tasks. For killing existing timers in advance.
+        try:
+            current_task_set = asyncio.all_tasks()  # get all previous tasks. For killing existing timers in advance.
+        except RuntimeError:
+            current_task_set = set()  # fail-safe. when the program runs for the first time and no existing event loop
         if len(current_task_set) > 1:
             for t in current_task_set:
                 if t._callbacks is not None:
