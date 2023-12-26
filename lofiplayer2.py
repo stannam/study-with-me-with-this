@@ -1,7 +1,10 @@
 import asyncio
-import os
-import random
-import pyglet
+from os import path, listdir
+from pyglet import media
+from random import choice
+
+
+base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
 
 
 class MusicPlayer:
@@ -14,8 +17,8 @@ class MusicPlayer:
         self.volume = 0.6  # Default volume set to 0.6
 
     def get_music_files(self):
-        folder_path = os.path.join("resource", "sound", "lofi")
-        music_files = [f for f in os.listdir(folder_path) if f.endswith(".mp3")]
+        folder_path = path.join(base_dir, "resource", "sound", "lofi")
+        music_files = [f for f in listdir(folder_path) if f.endswith(".mp3")]
         return music_files
 
     async def player_wrapper(self, session_length):
@@ -36,31 +39,34 @@ class MusicPlayer:
 
     async def play_music(self):
         played_songs = []
-        played_songs_path = os.path.join('log','played_lofi.txt')
+        played_songs_path = path.join(base_dir, 'log', 'played_lofi.txt')
         with open(played_songs_path, 'r', encoding='utf-8') as f:
             n_lofi = len(self.music_files)  # number of lofi songs
+            if n_lofi == 0:
+                raise FileNotFoundError('No lofi music found. Please download music files.')
             lines = f.readlines()[-(int(n_lofi * 0.8)):]
             for l in lines:
                 played_songs.append(l.strip())
         if not self.is_playing:
-            with open(os.path.join(os.getcwd(), 'log', 'study_rest.txt'), 'r', encoding='utf-8') as f:
+            with open(path.join(base_dir, 'log', 'study_rest.txt'), 'r', encoding='utf-8') as f:
                 study_or_rest = f.read()
                 if 'r' in study_or_rest:
                     return
             while True:
-                music_file = random.choice(self.music_files)
+                music_file = choice(self.music_files)
+                print(music_file)
                 if music_file in played_songs:
                     continue
                 msg_current_lofi = f'{music_file[:-4]}   :::   Music provided by Lofi Girl. ' \
                                    f'Listen to Lofi Girl at bit.ly/lofigirI-playlists' \
                                    f'                 '
-                with open('log/current_lofi.txt', 'w+', encoding="utf-8") as f:
+                with open(path.join(base_dir, 'log', 'current_lofi.txt'), 'w+', encoding="utf-8") as f:
                     f.write(msg_current_lofi)
                 with open(played_songs_path, 'a', encoding='utf-8') as f:
                     f.write(music_file + '\n')
                 played_songs.append(music_file)
-                self.player = pyglet.media.Player()
-                source = pyglet.media.load(os.path.join("resource", "sound", "lofi", music_file))
+                self.player = media.Player()
+                source = media.load(path.join(base_dir, "resource", "sound", "lofi", music_file))
                 self.player.queue(source)
                 self.player.volume = self.volume if not self.is_muted else 0
                 self.player.play()
@@ -96,8 +102,3 @@ class MusicPlayer:
             music_file = self.music_files[self.current_index]
             return music_file, self.volume
         return None, None
-
-
-if __name__ == "__main__":
-    music_player = MusicPlayer()
-    music_player.play_music()
