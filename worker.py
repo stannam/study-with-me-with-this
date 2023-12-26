@@ -199,7 +199,7 @@ def update_timetable():
 
 def write_html(tt_list):
     try:
-        meta_data = open('./log/tb_metadata.txt', 'r', encoding='utf-8-sig')
+        meta_data = open(path.join(base_dir, 'log', 'tb_metadata.txt'), 'r', encoding='utf-8-sig')
         template_lines = meta_data.readlines()
         meta_data.close()
 
@@ -232,10 +232,10 @@ def write_html(tt_list):
                           '  <table>\n',
                           '  </table>\n</body>\n</html>'
                           ]
-        meta_data = open('./log/tb_metadata.txt', 'w+', encoding='utf-8-sig')
+        meta_data = open(path.join(base_dir, 'log', 'tb_metadata.txt'), 'w+', encoding='utf-8-sig')
         meta_data.writelines(template_lines)
         meta_data.close()
-        meta_data = open('./log/tb_metadata.txt', 'r', encoding='utf-8-sig')
+        meta_data = open(path.join(base_dir, 'log', 'tb_metadata.txt'), 'r', encoding='utf-8-sig')
         template_lines = meta_data.readlines()
         meta_data.close()
 
