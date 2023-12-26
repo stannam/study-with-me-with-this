@@ -1,0 +1,5 @@
+qasync~=0.27.1
+pyqt5~=5.15.10
+pyglet~=2.0.10
+requests~=2.31.0
+pyqtwebengine~=5.15.6
