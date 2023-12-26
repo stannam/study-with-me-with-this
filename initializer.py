@@ -4,6 +4,9 @@
 import sys
 from os import path
 from shutil import rmtree, copytree
+from requests import get
+from zipfile import ZipFile
+from io import BytesIO
 
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
@@ -54,7 +57,7 @@ def resource_check():
         files = [required_log_files, required_resource_files, required_sound_files]
 
         for d, filelist in zip(dirs, files):
-            # loop over each required file to cehck
+            # loop over each required file to check
             for file in filelist:
                 if '_dir' in file:
                     to_check = path.join(d, file.split('_')[0])
@@ -87,7 +90,7 @@ def initialize():
 
     try:
         copytree(source_log_dir, path.join(base_dir, 'log'))
-        print("'log' folder copied successfully.")
+        print("[INFO] 'log' folder copied successfully.")
     except OSError as e:
         print(f"[ERROR] Error copying folder: {e}")
 
@@ -100,9 +103,26 @@ def initialize():
 
     try:
         copytree(source_resource_dir, path.join(base_dir, 'resource'))
-        print("'resource' folder copied successfully.")
+        print("[INFO] 'resource' folder copied successfully.")
     except OSError as e:
         print(f"[ERROR] Error copying folder: {e}")
+
+    # populate the music directory so that the program can run out of the box.
+    music_dir = path.join(base_dir, 'resource', 'sound', 'lofi')
+    r = get('https://github.com/stannam/study-with-me-with-this/raw/master/music_samples/public%20domain.zip')
+    # Check if the request was successful (status code 200)
+    while True:
+        if r.status_code == 200:
+            # Open the ZIP file from the response content
+            with ZipFile(BytesIO(r.content)) as zip_ref:
+                # Extract all contents to the destination folder
+                zip_ref.extractall(music_dir)
+            print("[INFO] Download and extraction successful.")
+            break
+        else:
+            print(f"[ERROR] Failed to download the file. Status code: {r.status_code}")
+
+
     return 0
 
 
