@@ -10,7 +10,8 @@ from io import BytesIO
 
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
-from PyQt5.QtWidgets import QMessageBox, QPushButton
+from PyQt5.QtWidgets import QApplication, QMessageBox, QPushButton, QWidget, QProgressBar, QVBoxLayout, QLabel, QListWidget, \
+    QListWidgetItem
 
 base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
 
@@ -77,53 +78,99 @@ def resource_check():
 
 def initialize():
     # copy the default data from the source to the user's document folder
-    print("[INFO] Now the program will try to initialize local resources.")
-    source_log_dir = path.join(root_dir, 'log')
-    source_resource_dir = path.join(root_dir, 'resource')
-
-    # first the log folder
-    try:
-        rmtree(path.join(base_dir, 'log'))
-        print("[INFO] Existing 'log' folder deleted.")
-    except OSError as e:
-        print(f"[ERROR] Error deleting folder: {e}")
-
-    try:
-        copytree(source_log_dir, path.join(base_dir, 'log'))
-        print("[INFO] 'log' folder copied successfully.")
-    except OSError as e:
-        print(f"[ERROR] Error copying folder: {e}")
-
-    # now the resource folder
-    try:
-        rmtree(path.join(base_dir, 'resource'))
-        print("[INFO] Existing 'resource' folder deleted.")
-    except OSError as e:
-        print(f"[ERROR] Error deleting folder: {e}")
-
-    try:
-        copytree(source_resource_dir, path.join(base_dir, 'resource'))
-        print("[INFO] 'resource' folder copied successfully.")
-    except OSError as e:
-        print(f"[ERROR] Error copying folder: {e}")
-
-    # populate the music directory so that the program can run out of the box.
-    music_dir = path.join(base_dir, 'resource', 'sound', 'lofi')
-    r = get('https://github.com/stannam/study-with-me-with-this/raw/master/music_samples/public%20domain.zip')
-    # Check if the request was successful (status code 200)
-    while True:
-        if r.status_code == 200:
-            # Open the ZIP file from the response content
-            with ZipFile(BytesIO(r.content)) as zip_ref:
-                # Extract all contents to the destination folder
-                zip_ref.extractall(music_dir)
-            print("[INFO] Download and extraction successful.")
-            break
-        else:
-            print(f"[ERROR] Failed to download the file. Status code: {r.status_code}")
-
-
+    ex = InitialLoader()
+    ex.show()
+    ex.close()
     return 0
+
+
+class InitialLoader(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle('My Application')
+        self.setGeometry(300, 300, 400, 200)
+
+        self.loading_window = LoadingWindow()
+        self.loading_window.show()
+        self.loading_window.add_message("[INFO] Now the program will try to initialize local resources.")
+        self.loading_window.set_progress(10)
+        QApplication.processEvents()
+        source_log_dir = path.join(root_dir, 'log')
+        source_resource_dir = path.join(root_dir, 'resource')
+
+        # first the log folder
+        try:
+            rmtree(path.join(base_dir, 'log'))
+            self.loading_window.add_message("[INFO] Existing 'log' folder deleted.")
+            QApplication.processEvents()
+        except OSError as e:
+            self.loading_window.add_message(f"[ERROR] Error deleting folder: {e}")
+            QApplication.processEvents()
+        self.loading_window.set_progress(20)
+        QApplication.processEvents()
+
+        try:
+            copytree(source_log_dir, path.join(base_dir, 'log'))
+            self.loading_window.add_message("[INFO] 'log' folder copied successfully.")
+            QApplication.processEvents()
+        except OSError as e:
+            self.loading_window.add_message(f"[ERROR] Error copying folder: {e}")
+            QApplication.processEvents()
+        self.loading_window.set_progress(30)
+        QApplication.processEvents()
+
+        # now the resource folder
+        try:
+            rmtree(path.join(base_dir, 'resource'))
+            self.loading_window.add_message("[INFO] Existing 'resource' folder deleted.")
+            QApplication.processEvents()
+        except OSError as e:
+            self.loading_window.add_message(f"[ERROR] Error deleting folder: {e}")
+            QApplication.processEvents()
+        self.loading_window.set_progress(40)
+        QApplication.processEvents()
+
+        try:
+            copytree(source_resource_dir, path.join(base_dir, 'resource'))
+            self.loading_window.add_message("[INFO] 'resource' folder copied successfully.")
+            QApplication.processEvents()
+        except OSError as e:
+            self.loading_window.add_message(f"[ERROR] Error copying folder: {e}")
+            QApplication.processEvents()
+        self.loading_window.set_progress(50)
+        QApplication.processEvents()
+
+        # populate the music directory so that the program can run out of the box.
+        music_dir = path.join(base_dir, 'resource', 'sound', 'lofi')
+        self.loading_window.add_message("[INFO] Trying to connect to the online music files (royalty-free musics)")
+        QApplication.processEvents()
+        r = get(
+            'https://www.dropbox.com/scl/fi/sshdq5l02i2q6mxjmkhnp/public_domain.zip?rlkey=xw9xfosq2x2k4mrmizb7k4ps0&dl=1')
+        # Check if the request was successful (status code 200)
+
+        while True:
+            if r.status_code == 200:
+                self.loading_window.set_progress(65)
+                self.loading_window.add_message("[INFO] Connected to the music files.")
+                self.loading_window.add_message("[INFO] Now trying to unzip the files.")
+
+                QApplication.processEvents()
+                # Open the ZIP file from the response content
+                with ZipFile(BytesIO(r.content)) as zip_ref:
+                    # Extract all contents to the destination folder
+                    zip_ref.extractall(music_dir)
+
+                self.loading_window.add_message("[INFO] Sample music files are downloaded and extracted.")
+                QApplication.processEvents()
+                self.loading_window.set_progress(100)
+                QApplication.processEvents()
+                break
+            else:
+                self.loading_window.add_message(f"[ERROR] Failed to download the file. Status code: {r.status_code}")
+                QApplication.processEvents()
+        self.loading_window.close()
+        self.close()
 
 
 class WarningDialog(QMessageBox):
@@ -145,4 +192,30 @@ class WarningDialog(QMessageBox):
         # Open the specified path in the default file manager
         to_path = path.join(base_dir, 'resource', 'sound', 'lofi')
         QDesktopServices.openUrl(QUrl.fromLocalFile(to_path))
+
+class LoadingWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('Loading...')
+        self.setGeometry(300, 300, 600, 200)
+        self.messages_list = QListWidget()
+        self.progress_bar = QProgressBar()
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.messages_list)
+        layout.addWidget(self.progress_bar)
+
+        self.setLayout(layout)
+
+    def add_message(self, message):
+        item = QListWidgetItem(message)
+        self.messages_list.addItem(item)
+        self.messages_list.scrollToBottom()
+
+    def set_progress(self, value):
+        self.progress_bar.setValue(value)
 
