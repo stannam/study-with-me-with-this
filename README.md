@@ -2,6 +2,10 @@
 
 # Study with me with this
 
-Implementing Pomodoro study method.
+Implementing Pomodoro study method. A toy project to practice asynchronous programming in Python.
 
-Optional camera function (eventually it can use CV to measure *actual study time*) 
+Written in Python 3.10. qasync~=0.23.0 is strictly required: a higher version doesn't work.
+
+Optional camera function. Aiming to use computer vision to measure *actual study time*, eventually.
+
+
