@@ -31,7 +31,7 @@ if __name__ == '__main__':
     ongoing_window = OngoingWindow(camera=False)
     if platform == 'win32':
         # camera disable by default and only enable if windows
-        ongoing_window = OngoingWindow(camera=False)
+        ongoing_window = OngoingWindow(camera=True)
 
     # Define a custom slot to close both windows
     def close_both_windows():
