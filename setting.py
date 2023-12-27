@@ -276,10 +276,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         lofi_path = path.join(base_dir, 'resource', 'sound', 'lofi')
         music_files = [f for f in listdir(lofi_path) if f.endswith(".mp3")]
         if len(music_files) == 0:
-            QMessageBox.Critical(self, "No music found",
-                                 f"There is no music to play in {lofi_path}\n"
-                                 f"Please make sure to download lofi music from \n"
-                                 f"https://lofigirl.com/releases/")
+            QMessageBox.critical(self, "No music found",
+                                 f"There is no music to play in the following path\n{lofi_path}\n"
+                                 f"Please make sure to download lofi music.\n"
+                                 f"Consider\nhttps://lofigirl.com/releases/")
             return 1
         return 0
 

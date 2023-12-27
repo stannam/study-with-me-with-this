@@ -4,7 +4,7 @@ import asyncio
 from sys import argv
 from datetime import datetime, timedelta
 from pyglet import media
-from os import path
+from os import path, getcwd
 
 # This program is the gist of the software. It can run by its own (CLI).
 base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
@@ -200,44 +200,13 @@ def update_timetable():
 def write_html(tt_list):
     try:
         meta_data = open(path.join(base_dir, 'log', 'tb_metadata.txt'), 'r', encoding='utf-8-sig')
-        template_lines = meta_data.readlines()
-        meta_data.close()
+
 
     except FileNotFoundError:
-        template_lines = ['<!DOCTYPE html>\n',
-                          '<html>\n<head>\n'
-                          # '<meta http-equiv="refresh" content="5">'
-                          '  <style>\n'
-                          '      @import url(\'https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap\');\n'
-                          '          body {\n'
-                          '              background-color: rgba(24, 24, 24, 255);\n'
-                          '              font-family: \'Gowun Dodum\', sans-serif;\n'
-                          '          }\n'
-                          '          table {\n'
-                          '              border: 0px;\n'
-                          '              font-size: 7vw;\n'
-                          '              font-weight: bold;\n'
-                          '              text-align: left;\n'
-                          '              width: 100%;\n'
-                          '              border-spacing: 0;\n'
-                          '              padding: 0px;\n'
-                          '              white-space:pre;\n'
-                          '          }\n'
-                          '          tr {color: white;}\n'
-                          '          tr.highlighted {background-color: white; color: black;}\n'
-                          '  </style>\n'
-                          '</head>\n\n'
-                          '<body>\n'
-                          '  <script type="text/javascript" src="refresh.js"></script>\n'
-                          '  <table>\n',
-                          '  </table>\n</body>\n</html>'
-                          ]
-        meta_data = open(path.join(base_dir, 'log', 'tb_metadata.txt'), 'w+', encoding='utf-8-sig')
-        meta_data.writelines(template_lines)
-        meta_data.close()
-        meta_data = open(path.join(base_dir, 'log', 'tb_metadata.txt'), 'r', encoding='utf-8-sig')
-        template_lines = meta_data.readlines()
-        meta_data.close()
+        meta_data = open(path.join(getcwd, 'log', 'tb_metadata.txt'), 'r', encoding='utf-8-sig')
+
+    template_lines = meta_data.readlines()
+    meta_data.close()
 
     header = template_lines[:-3]
     tail = template_lines[-3:]
