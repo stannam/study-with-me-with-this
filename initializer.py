@@ -4,9 +4,7 @@
 import sys
 from os import path
 from shutil import rmtree, copytree
-from requests import get
-from zipfile import ZipFile
-from io import BytesIO
+from time import sleep
 
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
@@ -93,8 +91,14 @@ class InitialLoader(QWidget):
 
         self.loading_window = LoadingWindow()
         self.loading_window.show()
-        self.loading_window.add_message("[INFO] Now the program will try to initialize local resources.")
+        self.loading_window.add_message("[INFO] WELCOME. It seems you launched it for the first time.\n"
+                                        "Please allow the program to finish initial setup.")
         self.loading_window.set_progress(10)
+        QApplication.processEvents()
+        sleep(5)
+
+        self.loading_window.add_message("[INFO] Now the program will try to initialize local resources.")
+        self.loading_window.set_progress(15)
         QApplication.processEvents()
         source_log_dir = path.join(root_dir, 'log')
         source_resource_dir = path.join(root_dir, 'resource')
@@ -107,7 +111,7 @@ class InitialLoader(QWidget):
         except OSError as e:
             self.loading_window.add_message(f"[ERROR] Error deleting folder: {e}")
             QApplication.processEvents()
-        self.loading_window.set_progress(20)
+        self.loading_window.set_progress(30)
         QApplication.processEvents()
 
         try:
@@ -117,7 +121,7 @@ class InitialLoader(QWidget):
         except OSError as e:
             self.loading_window.add_message(f"[ERROR] Error copying folder: {e}")
             QApplication.processEvents()
-        self.loading_window.set_progress(30)
+        self.loading_window.set_progress(60)
         QApplication.processEvents()
 
         # now the resource folder
@@ -128,7 +132,7 @@ class InitialLoader(QWidget):
         except OSError as e:
             self.loading_window.add_message(f"[ERROR] Error deleting folder: {e}")
             QApplication.processEvents()
-        self.loading_window.set_progress(40)
+        self.loading_window.set_progress(90)
         QApplication.processEvents()
 
         try:
@@ -138,37 +142,9 @@ class InitialLoader(QWidget):
         except OSError as e:
             self.loading_window.add_message(f"[ERROR] Error copying folder: {e}")
             QApplication.processEvents()
-        self.loading_window.set_progress(50)
+        self.loading_window.set_progress(100)
         QApplication.processEvents()
 
-        # populate the music directory so that the program can run out of the box.
-        music_dir = path.join(base_dir, 'resource', 'sound', 'lofi')
-        self.loading_window.add_message("[INFO] Trying to connect to the online music files (royalty-free musics)")
-        QApplication.processEvents()
-        r = get(
-            'https://www.dropbox.com/scl/fi/sshdq5l02i2q6mxjmkhnp/public_domain.zip?rlkey=xw9xfosq2x2k4mrmizb7k4ps0&dl=1')
-        # Check if the request was successful (status code 200)
-
-        while True:
-            if r.status_code == 200:
-                self.loading_window.set_progress(65)
-                self.loading_window.add_message("[INFO] Connected to the music files.")
-                self.loading_window.add_message("[INFO] Now trying to unzip the files.")
-
-                QApplication.processEvents()
-                # Open the ZIP file from the response content
-                with ZipFile(BytesIO(r.content)) as zip_ref:
-                    # Extract all contents to the destination folder
-                    zip_ref.extractall(music_dir)
-
-                self.loading_window.add_message("[INFO] Sample music files are downloaded and extracted.")
-                QApplication.processEvents()
-                self.loading_window.set_progress(100)
-                QApplication.processEvents()
-                break
-            else:
-                self.loading_window.add_message(f"[ERROR] Failed to download the file. Status code: {r.status_code}")
-                QApplication.processEvents()
         self.loading_window.close()
         self.close()
 

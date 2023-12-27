@@ -1,5 +1,5 @@
 import asyncio
-from os import path
+from os import path, listdir
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import Qt, QTime, pyqtSignal
@@ -228,6 +228,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     print('need to kill this task')
                     print('kill it')
             asyncio.create_task(self.cancel_existing_tasks(current_task_set))
+        lofi_check_res = self.lofi_check()  # make sure mp3 files are in the folder. If not, do not run.
+        if lofi_check_res == 1:
+            # there was no music file in the music folder. do nothing.
+            return
 
         countdown_list = list()
         self.first_session = self.timerEdit.time()
@@ -265,6 +269,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if minute_diff < -(6 * 60):
             return True
         return 0 < minute_diff < minute_max_var
+
+    def lofi_check(self):
+        # check music folder and make sure lofi music is there
+        # return 0 if okay to go; # return 1 if no music
+        lofi_path = path.join(base_dir, 'resource', 'sound', 'lofi')
+        music_files = [f for f in listdir(lofi_path) if f.endswith(".mp3")]
+        if len(music_files) == 0:
+            QMessageBox.Critical(self, "No music found",
+                                 f"There is no music to play in {lofi_path}\n"
+                                 f"Please make sure to download lofi music from \n"
+                                 f"https://lofigirl.com/releases/")
+            return 1
+        return 0
 
     async def timer_task(self, cd_list):
         for item in cd_list:
