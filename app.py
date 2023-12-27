@@ -1,4 +1,4 @@
-from sys import argv, exit
+from sys import argv, exit, platform
 import asyncio
 from qasync import QEventLoop
 from os import path
@@ -27,7 +27,11 @@ if __name__ == '__main__':
 
     # launch two windows
     setting_window = MainWindow()
-    ongoing_window = OngoingWindow(camera=True)
+
+    ongoing_window = OngoingWindow(camera=False)
+    if platform == 'win32':
+        # camera disable by default and only enable if windows
+        ongoing_window = OngoingWindow(camera=False)
 
     # Define a custom slot to close both windows
     def close_both_windows():
