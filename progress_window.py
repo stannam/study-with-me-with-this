@@ -1,7 +1,8 @@
 import sys
 from os import path
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, \
-    QPushButton, QMessageBox
+    QPushButton
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
@@ -24,7 +25,12 @@ class OngoingWindow(QMainWindow):
     def __init__(self, camera=False):
         super().__init__()
 
+        # initial gui settings
         self.setWindowTitle("Study with me")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("icons/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
+
         self.setWindowFlag(Qt.WindowStaysOnTopHint, False)  # Disable always on top
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)  # Disable close button
         self.setWindowFlag(Qt.WindowTitleHint, False)

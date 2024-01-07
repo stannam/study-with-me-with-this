@@ -1,6 +1,6 @@
 import asyncio
 from os import path, listdir
-from PyQt5 import QtWidgets
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import Qt, QTime, pyqtSignal
 
@@ -36,6 +36,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.now = QTime.currentTime()
         self.n_of_session = 0
         self.first_session = QTime.currentTime()
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("icons/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
 
         # initial todolist, timer and now_playing
         self.todo_load()
