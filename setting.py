@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from os import path, listdir
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
@@ -37,7 +38,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.n_of_session = 0
         self.first_session = QTime.currentTime()
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("icons/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        if getattr(sys, 'frozen', False):
+            # If frozen (executable), use sys._MEIPASS to get the bundle directory
+            icon_path = path.join(sys._MEIPASS,'icons', 'icon.ico')
+        else:
+            # If running as a script, use the current directory
+            icon_path = 'icons/icon.ico'
+        icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)
 
         # initial todolist, timer and now_playing

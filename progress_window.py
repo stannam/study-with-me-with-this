@@ -28,7 +28,13 @@ class OngoingWindow(QMainWindow):
         # initial gui settings
         self.setWindowTitle("Study with me")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("icons/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        if getattr(sys, 'frozen', False):
+            # If frozen (executable), use sys._MEIPASS to get the bundle directory
+            icon_path = path.join(sys._MEIPASS,'icons', 'icon.ico')
+        else:
+            # If running as a script, use the current directory
+            icon_path = 'icons/icon.ico'
+        icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon)
 
         self.setWindowFlag(Qt.WindowStaysOnTopHint, False)  # Disable always on top
