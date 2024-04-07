@@ -283,7 +283,7 @@ def by_num_of_sessions(t, first_session_time=None, timetable_only=False, study_l
 
 
 def ring_bell():
-    bell_path = path.join(base_dir, 'resource','sound','bell1.mp3')
+    bell_path = path.join(base_dir, 'resource', 'sound',' bell.mp3')
 
     # ring bell using pygame
     # pygame.mixer.init()

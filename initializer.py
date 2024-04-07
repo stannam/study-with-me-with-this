@@ -50,7 +50,7 @@ def resource_check():
 
         # third, sound folder
         sound_dir = path.join(base_dir, 'resource', 'sound')
-        required_sound_files = ["lofi_dir", "bell1.mp3"]
+        required_sound_files = ["lofi_dir", "bell.mp3"]
 
         dirs = [log_dir, resource_dir, sound_dir]
         files = [required_log_files, required_resource_files, required_sound_files]
