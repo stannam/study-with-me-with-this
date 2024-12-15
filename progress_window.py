@@ -8,6 +8,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtMultimedia import QCamera, QCameraInfo
 
+import state
+
 RESOURCE_PATH = path.join(path.normpath(path.expanduser('~/Documents/Study-with-me')), 'log')
 
 
@@ -204,8 +206,8 @@ class OngoingWindow(QMainWindow):
         self.study_break_label.setMaximumHeight(heights[2])
         right_layout.addWidget(self.study_break_label)
 
-        # Right sub-part with content from "[STUDY]_DOWN.txt" file
-        self.study_down_label = QLabel(read_resource('[STUDY]_DOWN.txt'))
+        # Right sub-part with content from timer(in state.timers)
+        self.study_down_label = QLabel(state.timers['study'])
         self.study_down_label.setStyleSheet(self.styles["study_down_label"])
         self.study_down_label.setAlignment(Qt.AlignCenter)
         self.study_down_label.setMinimumHeight(heights[3])
@@ -248,25 +250,23 @@ class OngoingWindow(QMainWindow):
 
     def update_labels(self):
         # Update the contents of the labels
-        self.currently_doing_text.setText(read_resource('currently_doing.txt')[:self.letter_limit])
-        self.current_music_text.setText(read_resource('current_lofi.txt')[:self.letter_limit])
+        self.currently_doing_text.setText(state.currently['doing'][:self.letter_limit])
+        self.current_music_text.setText(state.currently['lofi'][:self.letter_limit])
         self.todolist_label.setText(read_resource('todolist.txt'))
         self.update_study_rest()
 
     def update_study_rest(self):
-        with open(path.join(RESOURCE_PATH, 'study_rest.txt'), 'r', encoding='utf-8') as f:
-            study_or_rest = f.read()
-
+        study_or_rest = state.study_or_rest
         if 'r' in study_or_rest:
-            countdown_file = '[BREAK]_TIME.txt'
+            timer_str = state.timers['break']
             study_break = 'BREAK TIME'
             self.study_down_label.setStyleSheet(self.styles["rest_down_label"])
 
         else:
-            countdown_file = '[STUDY]_DOWN.txt'
+            timer_str = state.timers['study']
             study_break = 'STUDY TIME'
             self.study_down_label.setStyleSheet(self.styles["study_down_label"])
-        self.study_down_label.setText(read_resource(countdown_file))
+        self.study_down_label.setText(timer_str)
         self.study_break_label.setText(study_break)
 
 

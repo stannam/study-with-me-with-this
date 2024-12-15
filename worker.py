@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from pyglet import media
 from os import path, getcwd
 
+import state
+
 # This program is the gist of the software. It can run by its own (CLI).
 base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
 
@@ -55,9 +57,8 @@ def countdown(t, breaktime=False, time_table=False):
 
     diffsec = int((target_time - current_time).total_seconds())
 
-    file_name = '[BREAK]_TIME.txt' if breaktime else '[STUDY]_DOWN.txt'
+    timer_type = 'break' if breaktime else 'study'
 
-    timer_path = path.join(base_dir, 'log', file_name)
     while diffsec:
         diffsec = int((target_time - datetime.now()).total_seconds())
         if diffsec < 0:
@@ -65,10 +66,9 @@ def countdown(t, breaktime=False, time_table=False):
 
         mins, secs = divmod(diffsec, 60)
         hours, mins = divmod(mins, 60)
-        timer = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
+        time_str = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
 
-        with open(timer_path, "w+", encoding='utf-8-sig') as f:  # print timer
-            f.write(timer)
+        state.timers[timer_type] = time_str
 
         if time_table:              # update timetable
             update_timetable()
@@ -85,7 +85,7 @@ async def a_countdown(input_t, breaktime=False, time_table=False):
     '''
     updates the timer.
 
-    :param t: str in time format e.g., 12:34 or in time format plus 'r' e.g., 12:34r
+    :param input_t: str in time format e.g., 12:34 or in time format plus 'r' e.g., 12:34r
     :param breaktime: Bool. whether break time or study time.
     :param time_table: Bool. whether time_table is printed.
     :return: False
@@ -98,7 +98,6 @@ async def a_countdown(input_t, breaktime=False, time_table=False):
         t = input_t
 
     try:
-
         target_time = [int(i) for i in t.split(':')]
     except ValueError:
         print(f'timer didnt start with {t}')
@@ -132,9 +131,8 @@ async def a_countdown(input_t, breaktime=False, time_table=False):
 
     diffsec = int((target_time - current_time).total_seconds())
 
-    file_name = '[BREAK]_TIME.txt' if breaktime else '[STUDY]_DOWN.txt'
+    timer_type = 'break' if breaktime else 'study'
 
-    timer_path = path.join(base_dir, 'log', file_name)
     while diffsec:
         diffsec = int((target_time - datetime.now()).total_seconds())
         if diffsec < 0:
@@ -142,10 +140,10 @@ async def a_countdown(input_t, breaktime=False, time_table=False):
 
         mins, secs = divmod(diffsec, 60)
         hours, mins = divmod(mins, 60)
-        timer = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
+        time_str = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
 
-        with open(timer_path, "w+", encoding='utf-8-sig') as f:  # print timer
-            f.write(timer)
+        state.timers[timer_type] = time_str
+
         if time_table:              # update timetable
             update_timetable()
         # print(f'input_t:{input_t}\ntarget:{target_time}\ncurrenttime:{datetime.now()}\ntimer:{timer}\n------\n')
@@ -200,7 +198,6 @@ def update_timetable():
 def write_html(tt_list):
     try:
         meta_data = open(path.join(base_dir, 'log', 'tb_metadata.txt'), 'r', encoding='utf-8-sig')
-
 
     except FileNotFoundError:
         meta_data = open(path.join(getcwd, 'log', 'tb_metadata.txt'), 'r', encoding='utf-8-sig')
@@ -283,7 +280,7 @@ def by_num_of_sessions(t, first_session_time=None, timetable_only=False, study_l
 
 
 def ring_bell():
-    bell_path = path.join(base_dir, 'resource', 'sound',' bell.mp3')
+    bell_path = path.join(base_dir, 'resource', 'sound', 'bell1.mp3')
 
     # ring bell using pygame
     # pygame.mixer.init()

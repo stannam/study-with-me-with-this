@@ -9,6 +9,7 @@ from lofiplayer2 import MusicPlayer
 from MainWindow import Ui_MainWindow
 
 import worker
+import state
 base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
 
 
@@ -79,9 +80,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # start timer button
         self.start_button.clicked.connect(self.timer_start)
 
-        # start nb now_playing button
-        # self.nb_music_button.clicked.connect(self.nb_start)
-
         # todolist default
         self.apply_default_button.clicked.connect(self.default_todo)
 
@@ -123,9 +121,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         spacing_length = 18 - len(todo_content)
         spacing = ' ' * spacing_length if spacing_length > 0 else '         '
 
-        currently_doing_path = path.join(base_dir, 'log', 'currently_doing.txt')
-        with open(currently_doing_path, 'w+', encoding="utf-8") as f:
-            f.write(todo_content + spacing)
+        state.currently['doing'] = todo_content + spacing
 
     def default_todo(self):
         target_lineEdit = getattr(self, 'todoText_1')
@@ -305,18 +301,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             session = now.secsTo(then)
             session = session + 86400 if session < 0 else session
 
-            sr_path = path.join(base_dir, 'log', 'study_rest.txt')  # path for 'study_rest.txt'
             if item[-1] != 'r':
-                # if study time, update 'study_rest.txt' as 's' and play lofi
-                with open(sr_path, 'w+', encoding="utf-8") as f:
-                    f.write('s')
+                state.study_or_rest = 's'
                 music_play = asyncio.create_task(self.music_player.player_wrapper(session))
 
             elif item[-1] == 'r':
-                # if rest time, update 'study_rest.txt' as 'r' and play music from nb
                 self.music_player.stop_music()
-                with open(sr_path, 'w+', encoding="utf-8") as f:
-                    f.write('r')
+                state.study_or_rest = 'r'
 
             task = asyncio.create_task(worker.a_countdown(item, time_table=True))
             await task

@@ -3,6 +3,8 @@ from os import path, listdir
 from pyglet import media
 from random import choice
 
+import state
+
 
 base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
 
@@ -48,10 +50,8 @@ class MusicPlayer:
             for l in lines:
                 played_songs.append(l.strip())
         if not self.is_playing:
-            with open(path.join(base_dir, 'log', 'study_rest.txt'), 'r', encoding='utf-8') as f:
-                study_or_rest = f.read()
-                if 'r' in study_or_rest:
-                    return
+            if state.study_or_rest == 'r':
+                return
             while True:
                 music_file = choice(self.music_files)
                 print(music_file)
@@ -60,8 +60,7 @@ class MusicPlayer:
                 msg_current_lofi = f'{music_file[:-4]}   :::   Music provided by Lofi Girl. ' \
                                    f'Listen to Lofi Girl at bit.ly/lofigirI-playlists' \
                                    f'                 '
-                with open(path.join(base_dir, 'log', 'current_lofi.txt'), 'w+', encoding="utf-8") as f:
-                    f.write(msg_current_lofi)
+                state.currently['lofi'] = msg_current_lofi
                 with open(played_songs_path, 'a', encoding='utf-8') as f:
                     f.write(music_file + '\n')
                 played_songs.append(music_file)

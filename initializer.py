@@ -32,17 +32,13 @@ def resource_check():
         # first, 'log'
         log_dir = path.join(base_dir, 'log')
         required_log_files = ["clock.html",
-                              "currently_doing.txt",
-                              "current_lofi.txt",
                               "played_lofi.txt",
                               "refresh.js",
-                              "study_rest.txt",
                               "tb_metadata.txt",
                               "timetable.html",
                               "timetable.txt",
                               "todolist.txt",
-                              "[STUDY]_DOWN.txt",
-                              "[BREAK]_TIME.txt"]
+                              ]
 
         # second, resource folder
         resource_dir = path.join(base_dir, 'resource')
@@ -58,10 +54,7 @@ def resource_check():
         for d, filelist in zip(dirs, files):
             # loop over each required file to check
             for file in filelist:
-                if '_dir' in file:
-                    to_check = path.join(d, file.split('_')[0])
-                else:
-                    to_check = path.join(d, file)
+                to_check = path.join(d, file.split('_')[0]) if '_dir' in file else path.join(d, file)
                 if not path.exists(to_check):
                     flag = True
                     break
@@ -86,7 +79,7 @@ class InitialLoader(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle('My Application')
+        self.setWindowTitle('Study with me')
         self.setGeometry(300, 300, 400, 200)
 
         self.loading_window = LoadingWindow()
@@ -95,13 +88,13 @@ class InitialLoader(QWidget):
                                         "Please allow the program to finish initial setup.")
         self.loading_window.set_progress(10)
         QApplication.processEvents()
-        sleep(5)
 
         self.loading_window.add_message("[INFO] Now the program will try to initialize local resources.")
         self.loading_window.set_progress(15)
         QApplication.processEvents()
         source_log_dir = path.join(root_dir, 'log')
         source_resource_dir = path.join(root_dir, 'resource')
+        sleep(1)
 
         # first the log folder
         try:
@@ -194,4 +187,3 @@ class LoadingWindow(QWidget):
 
     def set_progress(self, value):
         self.progress_bar.setValue(value)
-
