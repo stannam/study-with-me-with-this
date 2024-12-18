@@ -1,15 +1,16 @@
 import asyncio
 import sys
 from os import path, listdir
-from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import (QMessageBox, QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QToolTip,
+                             QTimeEdit, QLabel, QPushButton, QMessageBox, QLineEdit, QGridLayout, QSpacerItem,
+                             QSizePolicy, QGroupBox, QRadioButton, QCheckBox)
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt, QTime, pyqtSignal
 
 from lofiplayer2 import MusicPlayer
-from MainWindow import Ui_MainWindow
-
 import worker
 import state
+
 base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
 
 
@@ -19,15 +20,21 @@ def show_help_bubble(widget, text):
     pos = widget.mapToGlobal(widget.rect().topRight())
 
     # Display the tooltip at the widget's position
-    QtWidgets.QToolTip.showText(pos, text, widget)
+    QToolTip.showText(pos, text, widget)
 
 
-class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow):
     closed = pyqtSignal()  # Custom signal to indicate the window is closed
 
-    def __init__(self, *args, obj=None, **kwargs):
-        super(MainWindow, self).__init__(*args, **kwargs)
-        self.setupUi(self)
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Study session setting")
+        self.setGeometry(200, 200, 650, 300)
+        self.main_widget = QWidget()
+        self.main_layout = QHBoxLayout(self.main_widget)
+
+        self.initialize_ui()
+        self.setCentralWidget(self.main_widget)
 
         # Disable the maximize button
         self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
@@ -38,22 +45,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.now = QTime.currentTime()
         self.n_of_session = 0
         self.first_session = QTime.currentTime()
-        icon = QtGui.QIcon()
+        icon = QIcon()
         if getattr(sys, 'frozen', False):
             # If frozen (executable), use sys._MEIPASS to get the bundle directory
             icon_path = path.join(sys._MEIPASS,'icons', 'icon.ico')
         else:
             # If running as a script, use the current directory
             icon_path = 'icons/icon.ico'
-        icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QPixmap(icon_path), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
 
         # initial todolist, timer and now_playing
         self.todo_load()
         self.timer_reset()
-        # played_lofi_path = path.join(base_dir, 'log', 'played_lofi.txt')
-        # f = open(played_lofi_path, 'a+', encoding="utf-8")
-        # f.close()
 
         # load lofi player
         self.music_player = MusicPlayer()
@@ -107,6 +111,159 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.todoRadio_3.toggled.connect(lambda: self.change_current_doing(3))
         self.todoRadio_4.toggled.connect(lambda: self.change_current_doing(4))
         self.todoRadio_5.toggled.connect(lambda: self.change_current_doing(5))
+
+    def initialize_ui(self):
+        btn_height = 30
+        left_groupbox = self.left_panel(unit_btn_height=btn_height)    # do the left side for timer and volumes
+        right_groupbox = self.right_panel(unit_btn_height=btn_height)  # do the right side for doto list
+
+        self.main_layout.addWidget(left_groupbox, stretch=2)
+        self.main_layout.addWidget(right_groupbox, stretch=3)
+
+    def left_panel(self, unit_btn_height):
+        lineEdit_width = 40
+        left_groupbox = QGroupBox("Timer settings")
+        left_layout = QVBoxLayout()
+
+        # timer
+        timer_layout = QGridLayout()
+
+        time_label = QLabel("Start studying at:")
+        time_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.timerEdit = QTimeEdit()
+        self.to_now_button = QPushButton("← To now")
+
+        session_label_1 = QLabel("with")
+        session_label_1.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.session_count_lineEdit = QLineEdit()
+        self.session_count_lineEdit.setFixedWidth(lineEdit_width)
+        session_label_2 = QLabel("sessions of")
+
+        self.study_length_lineEdit = QLineEdit()
+        self.study_length_lineEdit.setFixedWidth(lineEdit_width)
+        session_label_3 = QLabel("—   ")
+        self.break_length_lineEdit = QLineEdit()
+        self.break_length_lineEdit.setFixedWidth(lineEdit_width)
+
+        # row 0
+        timer_layout.addWidget(time_label, 0, 0, 1, 3)   # spans across 1 row and 2 columns
+        timer_layout.addWidget(self.timerEdit, 0, 3)
+        timer_layout.addWidget(self.to_now_button, 0, 4)
+
+        # row 1
+        timer_layout.addWidget(session_label_1, 1, 0)
+        timer_layout.addWidget(self.session_count_lineEdit, 1, 1, 1, 2)
+        timer_layout.addWidget(session_label_2, 1, 3)
+
+        # row 2
+        timer_layout.addWidget(self.study_length_lineEdit, 2, 0, 1, 2)
+        timer_layout.addWidget(session_label_3, 2, 2)
+        timer_layout.addWidget(self.break_length_lineEdit, 2, 3)
+
+        # row 3
+        timer_layout.addWidget(QLabel("(study time - break time, e.g., 50 - 10)"), 3, 0, 1, 5)
+
+        # Add grid layout to left_layout
+        left_layout.addLayout(timer_layout)
+
+        # Add vertical spacer between timer layout and buttons
+        left_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+        # volume control and defult + start buttons
+        control_layout = QGridLayout()
+        control_layout.setContentsMargins(0, 0, 0, 0)  # Remove padding
+        control_layout.setSpacing(0)                   # Remove spacing between widgets
+
+        self.volume_mute = QPushButton("🔇")
+        self.volume_mute.setFixedHeight(unit_btn_height * 4)
+        self.volume_up = QPushButton("🔊")
+        self.volume_up.setFixedHeight(unit_btn_height * 2)
+        self.volume_down = QPushButton("🔉")
+        self.volume_down.setFixedHeight(unit_btn_height * 2)
+
+        self.default_button = QPushButton("Default")
+        self.default_button.setFixedHeight(unit_btn_height)
+        self.start_button = QPushButton("START")
+        self.start_button.setFixedHeight(unit_btn_height * 3)
+
+        for button in [self.volume_mute, self.volume_up, self.volume_down, self.default_button, self.start_button]:
+            button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # column 1 and 2
+        control_layout.addWidget(self.volume_mute, 0, 0, 4, 1)
+        control_layout.addWidget(self.volume_up, 0, 1, 2, 1)
+        control_layout.addWidget(self.volume_down, 2, 1, 2, 1)
+
+        # column 3: Add column spacing
+        control_layout.setColumnStretch(2, 1)
+
+        # column 4
+        control_layout.addWidget(self.default_button, 0, 3, 1, 1)
+        control_layout.addWidget(self.start_button, 1, 3, 3, 1)
+
+        # Add column stretch to distribute available space evenly
+        control_layout.setColumnStretch(0, 1)  # Column 1
+        control_layout.setColumnStretch(1, 1)  # Column 2
+        control_layout.setColumnStretch(3, 1)  # Column 4
+
+        left_layout.addLayout(control_layout)
+        left_groupbox.setLayout(left_layout)
+        return left_groupbox
+
+    def right_panel(self, unit_btn_height):
+        right_groupbox = QGroupBox("Todo list")
+        right_layout = QVBoxLayout()
+        right_layout.setAlignment(Qt.AlignTop)
+
+        # To do list
+        todo_layout = QGridLayout()
+        todo_layout.setContentsMargins(0, 0, 0, 0)  # Remove padding
+        for i in range(1, 6):  # number 1 to 5
+            # each line
+            remove_btn = QPushButton("Remove")
+            rb = QRadioButton()
+            cb = QCheckBox()
+            todo_text = QLineEdit()
+
+            setattr(self, f'removeButton_{i}', remove_btn)
+            setattr(self, f'todo_{i}', cb)
+            setattr(self, f'todoRadio_{i}', rb)
+            setattr(self, f'todoText_{i}', todo_text)
+
+            # add widgets to the layout
+            todo_layout.addWidget(remove_btn, i - 1, 0)  # row=i-1, column=0
+            todo_layout.addWidget(rb, i - 1, 1)  # row=i-1, column=1
+            todo_layout.addWidget(cb, i - 1, 2)  # row=i-1, column=2
+            todo_layout.addWidget(todo_text, i - 1, 3)  # row=i-1, column=3
+        right_layout.addLayout(todo_layout)
+
+        # spacer
+        right_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+        # to do-related buttons
+        btns_layout = QGridLayout()
+        btns_layout.setContentsMargins(0, 0, 0, 0)  # Remove padding
+        btns_layout.setSpacing(0)                   # Remove spacing between widgets
+
+        self.apply_default_button = QPushButton("Apply default")
+        self.apply_default_button.setFixedHeight(unit_btn_height)
+        self.load_todo_txt_button = QPushButton("Load saved\ntodo")
+        self.load_todo_txt_button.setFixedHeight(unit_btn_height * 3)
+        self.update_todo_button = QPushButton("UPDATE\nTODO")
+        self.update_todo_button.setFixedHeight(unit_btn_height * 3)
+
+        btns_layout.addWidget(self.apply_default_button, 0, 1, 1, 2)
+        btns_layout.addWidget(self.load_todo_txt_button, 1, 1)
+        btns_layout.addWidget(self.update_todo_button, 1, 2)
+
+        # Add column stretch to distribute available space evenly
+        for col_n in range(3):
+            btns_layout.setColumnStretch(col_n, 1)  # Column 1
+
+        right_layout.addLayout(btns_layout)
+
+        right_groupbox.setLayout(right_layout)
+        return right_groupbox
 
     def change_current_doing(self, i=0):
         if i == 0:

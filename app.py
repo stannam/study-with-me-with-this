@@ -8,7 +8,6 @@ from initializer import WarningDialog, resource_check
 from setting import MainWindow
 from progress_window import OngoingWindow
 
-# use 'pyuic5 resource/mainwindow.ui -o MainWindow.py' on terminal
 base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
 
 
