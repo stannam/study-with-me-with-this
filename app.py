@@ -39,6 +39,7 @@ if __name__ == '__main__':
     # Define a custom slot to close both windows
     def close_both_windows():
         setting_window.close()
+        ongoing_window.ignore_close = False
         ongoing_window.close()
 
     # Connect the destroyed signal of setting_window to the custom slot

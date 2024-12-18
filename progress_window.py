@@ -2,7 +2,7 @@ import sys
 from os import path
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, \
-    QPushButton
+    QPushButton, QMessageBox
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
@@ -27,6 +27,9 @@ class OngoingWindow(QMainWindow):
     def __init__(self, camera=False):
         super().__init__()
 
+        # flag for ignoring close
+        self.ignore_close = True
+
         # initial gui settings
         self.setWindowTitle("Study with me")
         icon = QtGui.QIcon()
@@ -46,7 +49,7 @@ class OngoingWindow(QMainWindow):
 
         # camera settings
         self.need_camera = camera
-        if system.startswith('win'):
+        if state.os == 'win32':
             self.os = 'win'
             self.setFixedSize(1600, 900)  # Set fixed window size
             self.heights = [        # total = 900px
@@ -67,7 +70,7 @@ class OngoingWindow(QMainWindow):
                 "todolist_label": "color: white; font-family: NanumBarunPen; font-size: 30px;",
             }
 
-        elif system.startswith('darwin'):
+        else:
             self.os = 'mac'
             self.setFixedSize(300, 700)  # Set fixed window size
             self.styles = {
@@ -268,6 +271,16 @@ class OngoingWindow(QMainWindow):
             self.study_down_label.setStyleSheet(self.styles["study_down_label"])
         self.study_down_label.setText(timer_str)
         self.study_break_label.setText(study_break)
+
+    def closeEvent(self, event):
+        print(f'ignore_close value in ongoing windows: {self.ignore_close}')
+        if self.ignore_close:
+            msg = QMessageBox.warning(self,
+                                      "Close disabled",
+                                      "To quit, close the 'settings' window instead.",
+                                      QMessageBox.Ok
+                                      )
+            event.ignore()
 
 
 if __name__ == '__main__':

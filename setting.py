@@ -36,6 +36,8 @@ class MainWindow(QMainWindow):
         else:
             self.setGeometry(200, 200, 650, 300)
 
+        self.setFixedSize(self.size())
+
         self.main_widget = QWidget()
         self.main_layout = QHBoxLayout(self.main_widget)
 
