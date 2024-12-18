@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets
 from initializer import WarningDialog, resource_check
 from setting import MainWindow
 from progress_window import OngoingWindow
+import state
 
 base_dir = path.normpath(path.expanduser('~/Documents/Study-with-me'))  # base resource directory.
 
@@ -24,11 +25,14 @@ if __name__ == '__main__':
         warning = WarningDialog()
         warning.show()
 
+    # inquire current OS
+    state.os = platform
+
     # launch two windows
     setting_window = MainWindow()
 
     ongoing_window = OngoingWindow(camera=False)
-    if platform == 'win32':
+    if state.os == 'win32':
         # camera disable by default and only enable if windows
         ongoing_window = OngoingWindow(camera=True)
 

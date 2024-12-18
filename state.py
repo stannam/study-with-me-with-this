@@ -6,3 +6,4 @@ timers = {'study': '',
 currently = {'lofi': '',
              'doing': '',
              }
+os = ''  # current os info

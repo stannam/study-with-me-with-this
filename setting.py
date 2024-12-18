@@ -29,7 +29,13 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Study session setting")
-        self.setGeometry(200, 200, 650, 300)
+
+        # os dependent matters:
+        if state.os == 'darwin':
+            self.setGeometry(200, 200, 830, 400)
+        else:
+            self.setGeometry(200, 200, 650, 300)
+
         self.main_widget = QWidget()
         self.main_layout = QHBoxLayout(self.main_widget)
 
@@ -171,8 +177,9 @@ class MainWindow(QMainWindow):
 
         # volume control and defult + start buttons
         control_layout = QGridLayout()
-        control_layout.setContentsMargins(0, 0, 0, 0)  # Remove padding
-        control_layout.setSpacing(0)                   # Remove spacing between widgets
+        if state.os != 'darwin':
+            control_layout.setContentsMargins(0, 0, 0, 0)  # Remove padding
+            control_layout.setSpacing(0)                   # Remove spacing between widgets
 
         self.volume_mute = QPushButton("🔇")
         self.volume_mute.setFixedHeight(unit_btn_height * 4)
@@ -184,10 +191,15 @@ class MainWindow(QMainWindow):
         self.default_button = QPushButton("Default")
         self.default_button.setFixedHeight(unit_btn_height)
         self.start_button = QPushButton("START")
+        start_btn_font = self.start_button.font()
+        start_btn_font.setBold(True)
+        start_btn_font.setPointSize((start_btn_font.pointSize() + 2))
+        self.start_button.setFont(start_btn_font)
         self.start_button.setFixedHeight(unit_btn_height * 3)
 
-        for button in [self.volume_mute, self.volume_up, self.volume_down, self.default_button, self.start_button]:
-            button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        if state.os != 'darwin':
+            for button in [self.volume_mute, self.volume_up, self.volume_down, self.default_button, self.start_button]:
+                button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # column 1 and 2
         control_layout.addWidget(self.volume_mute, 0, 0, 4, 1)
@@ -218,6 +230,9 @@ class MainWindow(QMainWindow):
         # To do list
         todo_layout = QGridLayout()
         todo_layout.setContentsMargins(0, 0, 0, 0)  # Remove padding
+        if state.os == 'darwin':
+            todo_layout.setSpacing(6)
+
         for i in range(1, 6):  # number 1 to 5
             # each line
             remove_btn = QPushButton("Remove")
@@ -242,8 +257,9 @@ class MainWindow(QMainWindow):
 
         # to do-related buttons
         btns_layout = QGridLayout()
-        btns_layout.setContentsMargins(0, 0, 0, 0)  # Remove padding
-        btns_layout.setSpacing(0)                   # Remove spacing between widgets
+        if state.os != 'darwin':
+            btns_layout.setContentsMargins(0, 0, 0, 0)  # Remove padding
+            btns_layout.setSpacing(0)                   # Remove spacing between widgets
 
         self.apply_default_button = QPushButton("Apply default")
         self.apply_default_button.setFixedHeight(unit_btn_height)
