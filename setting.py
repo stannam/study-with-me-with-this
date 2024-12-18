@@ -93,30 +93,21 @@ class MainWindow(QMainWindow):
         # todolist default
         self.apply_default_button.clicked.connect(self.default_todo)
 
-        # todolist remove buttons
-        self.removeButton_1.clicked.connect(lambda: self.remove_todo(1))
-        self.removeButton_2.clicked.connect(lambda: self.remove_todo(2))
-        self.removeButton_3.clicked.connect(lambda: self.remove_todo(3))
-        self.removeButton_4.clicked.connect(lambda: self.remove_todo(4))
-        self.removeButton_5.clicked.connect(lambda: self.remove_todo(5))
-
         # todolist txt io
         self.load_todo_txt_button.clicked.connect(self.todo_load)
         self.update_todo_button.clicked.connect(self.todo_update)
 
-        # todolist checkbox
-        self.todo_1.toggled.connect(self.todo_update)
-        self.todo_2.toggled.connect(self.todo_update)
-        self.todo_3.toggled.connect(self.todo_update)
-        self.todo_4.toggled.connect(self.todo_update)
-        self.todo_5.toggled.connect(self.todo_update)
+        for i in range(1, 6):
+            # todolist remove buttons
+            getattr(self, f"removeButton_{i}").clicked.connect(lambda checked, idx=i: self.remove_todo(idx))
 
-        # todolist current doing radio
-        self.todoRadio_1.toggled.connect(lambda: self.change_current_doing(1))
-        self.todoRadio_2.toggled.connect(lambda: self.change_current_doing(2))
-        self.todoRadio_3.toggled.connect(lambda: self.change_current_doing(3))
-        self.todoRadio_4.toggled.connect(lambda: self.change_current_doing(4))
-        self.todoRadio_5.toggled.connect(lambda: self.change_current_doing(5))
+            # Connect checkboxes
+            getattr(self, f"todo_{i}").toggled.connect(self.todo_update)
+
+            # Connect radio buttons
+            getattr(self, f"todoRadio_{i}").toggled.connect(
+                lambda checked, idx=i: self.change_current_doing(idx)
+            )
 
     def initialize_ui(self):
         btn_height = 30
